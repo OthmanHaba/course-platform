@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+$routes->options('(:any)', static function () {}); // Handle OPTIONS requests
 
 // Admin Routes
 $routes->group('admin', function ($routes) {
