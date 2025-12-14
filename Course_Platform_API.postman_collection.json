@@ -1,0 +1,2385 @@
+{
+	"info": {
+		"_postman_id": "course-platform-api-001",
+		"name": "Course Platform API",
+		"description": "Complete API collection for the Course Learning Platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "portal_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Admin APIs",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Admin Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "List Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/users?page=1&per_page=10&user_type=student&search=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "user_type",
+											"value": "student"
+										},
+										{
+											"key": "search",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/users/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"is_active\": 1,\n    \"user_type\": \"student\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/users/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/users/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Courses",
+					"item": [
+						{
+							"name": "List Courses",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/courses?page=1&per_page=10&status=published&search=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "status",
+											"value": "published"
+										},
+										{
+											"key": "search",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Course",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Introduction to Web Development\",\n    \"slug\": \"intro-web-dev\",\n    \"description\": \"Learn the basics of web development\",\n    \"short_description\": \"Beginner web dev course\",\n    \"instructor_id\": 1,\n    \"category_id\": 1,\n    \"level\": \"beginner\",\n    \"language\": \"en\",\n    \"price\": 49.99,\n    \"is_free\": 0,\n    \"status\": \"draft\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/courses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Course",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/courses/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Course",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Advanced Web Development\",\n    \"description\": \"Updated description\",\n    \"price\": 59.99\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/courses/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Course Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/courses/1/status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses",
+										"1",
+										"status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Course",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/courses/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Sections",
+					"item": [
+						{
+							"name": "Create Section",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Getting Started\",\n    \"description\": \"Introduction section\",\n    \"order_number\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/courses/1/sections",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"courses",
+										"1",
+										"sections"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Section",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Section Title\",\n    \"description\": \"Updated description\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/sections/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"sections",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Section",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/sections/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"sections",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Lessons",
+					"item": [
+						{
+							"name": "Create Lesson",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Introduction to HTML\",\n    \"content_type\": \"video\",\n    \"video_url\": \"https://example.com/video.mp4\",\n    \"video_duration\": 600,\n    \"content\": \"Additional lesson content\",\n    \"order_number\": 1,\n    \"is_preview\": 1,\n    \"is_published\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/sections/1/lessons",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"sections",
+										"1",
+										"lessons"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Lesson",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Lesson Title\",\n    \"content\": \"Updated content\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/lessons/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"lessons",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Lesson",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/lessons/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"lessons",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Quizzes",
+					"item": [
+						{
+							"name": "Create Quiz",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"HTML Basics Quiz\",\n    \"description\": \"Test your HTML knowledge\",\n    \"pass_percentage\": 70,\n    \"time_limit\": 30,\n    \"max_attempts\": 3,\n    \"shuffle_questions\": 1,\n    \"show_results\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/lessons/1/quizzes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"lessons",
+										"1",
+										"quizzes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Quiz",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Quiz Title\",\n    \"pass_percentage\": 80\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/quizzes/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"quizzes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Quiz",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/quizzes/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"quizzes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Question",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"question_text\": \"What does HTML stand for?\",\n    \"question_type\": \"multiple_choice\",\n    \"options\": [\"Hyper Text Markup Language\", \"High Tech Modern Language\", \"Home Tool Markup Language\"],\n    \"correct_answer\": \"Hyper Text Markup Language\",\n    \"points\": 10,\n    \"explanation\": \"HTML stands for Hyper Text Markup Language\",\n    \"order_number\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/quizzes/1/questions",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"quizzes",
+										"1",
+										"questions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Question",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"question_text\": \"Updated question text\",\n    \"points\": 15\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/questions/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"questions",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Question",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/questions/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"questions",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "List Categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Web Development\",\n    \"slug\": \"web-development\",\n    \"description\": \"All about web development\",\n    \"parent_id\": null,\n    \"is_active\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Category Name\",\n    \"description\": \"Updated description\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/categories/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/categories/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Enrollments",
+					"item": [
+						{
+							"name": "List Enrollments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/enrollments?page=1&per_page=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"enrollments"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Enrollment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": 1,\n    \"course_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/enrollments",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"enrollments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Enrollment",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/enrollments/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"enrollments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"item": [
+						{
+							"name": "List Reviews",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/reviews?page=1&per_page=10&status=pending",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"reviews"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Approve Review",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/reviews/1/approve",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"reviews",
+										"1",
+										"approve"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Review",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/reviews/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"reviews",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Analytics",
+					"item": [
+						{
+							"name": "Overview",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/analytics/overview",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"analytics",
+										"overview"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Statistics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/analytics/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"analytics",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Course Analytics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/analytics/courses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"analytics",
+										"courses"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Media",
+					"item": [
+						{
+							"name": "Upload File",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "uploaded_by",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "entity_type",
+											"value": "course",
+											"type": "text"
+										},
+										{
+											"key": "entity_id",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/media/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"media",
+										"upload"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Media",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/admin/media/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"media",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Portal APIs",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"student@example.com\",\n    \"password\": \"password123\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/auth/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"student@example.com\",\n    \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/auth/logout",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Forgot Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"student@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/auth/forgot-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"forgot-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"reset-token-here\",\n    \"password\": \"newpassword123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/auth/reset-password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"reset-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verify Email",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/auth/verify-email/verification-token-here",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"auth",
+										"verify-email",
+										"verification-token-here"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Profile",
+					"item": [
+						{
+							"name": "Get Profile",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Profile",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"first_name\": \"Jane\",\n    \"last_name\": \"Smith\",\n    \"bio\": \"Web developer and designer\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/profile",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"current_password\": \"password123\",\n    \"new_password\": \"newpassword456\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/profile/password",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"profile",
+										"password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Avatar",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/profile/avatar",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"profile",
+										"avatar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Courses",
+					"item": [
+						{
+							"name": "Browse Courses",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses?page=1&per_page=12&category=&level=&search=&sort=newest",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "12"
+										},
+										{
+											"key": "category",
+											"value": ""
+										},
+										{
+											"key": "level",
+											"value": ""
+										},
+										{
+											"key": "search",
+											"value": ""
+										},
+										{
+											"key": "sort",
+											"value": "newest"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Featured Courses",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/featured",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"featured"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Popular Courses",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/popular",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"popular"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Course Details",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Course Preview",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/preview",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"preview"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{
+							"name": "List Categories",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Courses by Category",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/categories/1/courses?page=1&per_page=12",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"categories",
+										"1",
+										"courses"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "12"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Instructors",
+					"item": [
+						{
+							"name": "Get Instructor Profile",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/instructors/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"instructors",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Enrollments",
+					"item": [
+						{
+							"name": "My Courses",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/my-courses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"my-courses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Enroll in Course",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/enroll",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"enroll"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Enrollment Details",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/enrollments/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"enrollments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Learning",
+					"item": [
+						{
+							"name": "Get Course Curriculum",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/curriculum",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"curriculum"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Lesson",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/lessons/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"lessons",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Complete Lesson",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/lessons/1/complete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"lessons",
+										"1",
+										"complete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Next Lesson",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/lessons/1/next",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"lessons",
+										"1",
+										"next"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Course Progress",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/progress",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"progress"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Overall Progress",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/progress",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"progress"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Quizzes",
+					"item": [
+						{
+							"name": "Get Quiz",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/quizzes/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"quizzes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Quiz",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"answers\": {\n        \"1\": \"Hyper Text Markup Language\",\n        \"2\": \"true\",\n        \"3\": \"answer text\"\n    },\n    \"started_at\": \"2024-01-01 10:00:00\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/quizzes/1/submit",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"quizzes",
+										"1",
+										"submit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Result",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/quizzes/1/result",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"quizzes",
+										"1",
+										"result"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Quiz Attempts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/quizzes/1/attempts",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"quizzes",
+										"1",
+										"attempts"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"item": [
+						{
+							"name": "Create Review",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"rating\": 5,\n    \"review_text\": \"Great course! Learned a lot.\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/reviews",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"reviews"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Review",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"rating\": 4,\n    \"review_text\": \"Updated review text\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/reviews/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"reviews",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Review",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/reviews/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"reviews",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Course Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/portal/courses/1/reviews?page=1&per_page=10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"courses",
+										"1",
+										"reviews"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mark Review Helpful",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/reviews/1/helpful",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"reviews",
+										"1",
+										"helpful"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Wishlist",
+					"item": [
+						{
+							"name": "Get Wishlist",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/wishlist",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"wishlist"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add to Wishlist",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/wishlist/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"wishlist",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove from Wishlist",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/wishlist/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"wishlist",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Notes",
+					"item": [
+						{
+							"name": "Get Lesson Notes",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/lessons/1/notes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"lessons",
+										"1",
+										"notes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Note",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"note_text\": \"This is an important concept to remember\",\n    \"video_timestamp\": 120\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/lessons/1/notes",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"lessons",
+										"1",
+										"notes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Note",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"note_text\": \"Updated note text\",\n    \"video_timestamp\": 150\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/portal/notes/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"notes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Note",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{portal_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/portal/notes/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"portal",
+										"notes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
