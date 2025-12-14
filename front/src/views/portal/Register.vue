@@ -1,81 +1,78 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-      <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+  <div class="register-page">
+    <div class="register-card">
+      <div class="register-header">
+        <h1>Create Account</h1>
+        <p class="text-muted text-sm">Join us today</p>
+      </div>
 
-      <form @submit.prevent="handleRegister">
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="first_name">
-            First Name
-          </label>
-          <input
-            v-model="formData.first_name"
-            type="text"
-            id="first_name"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      <form @submit.prevent="handleRegister" class="register-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name" class="form-label">First Name</label>
+            <input
+              v-model="formData.first_name"
+              type="text"
+              id="first_name"
+              required
+              class="input"
+              placeholder="John"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="last_name" class="form-label">Last Name</label>
+            <input
+              v-model="formData.last_name"
+              type="text"
+              id="last_name"
+              required
+              class="input"
+              placeholder="Doe"
+            />
+          </div>
         </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">
-            Last Name
-          </label>
-          <input
-            v-model="formData.last_name"
-            type="text"
-            id="last_name"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-            Email
-          </label>
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
           <input
             v-model="formData.email"
             type="email"
             id="email"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="input"
+            placeholder="you@example.com"
           />
         </div>
 
-        <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-            Password
-          </label>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
           <input
             v-model="formData.password"
             type="password"
             id="password"
             required
             minlength="6"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="input"
+            placeholder="At least 6 characters"
           />
         </div>
 
-        <div v-if="error" class="mb-4 text-red-600 text-sm">
+        <div v-if="error" class="error-message">
           {{ error }}
         </div>
 
-        <div v-if="success" class="mb-4 text-green-600 text-sm">
+        <div v-if="success" class="success-message">
           {{ success }}
         </div>
 
-        <button
-          type="submit"
-          :disabled="loading"
-          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 mb-4"
-        >
-          {{ loading ? 'Creating Account...' : 'Register' }}
+        <button type="submit" :disabled="loading" class="btn btn-primary w-full">
+          {{ loading ? 'Creating Account...' : 'Create Account' }}
         </button>
 
-        <div class="text-center">
-          <router-link to="/login" class="text-blue-600 hover:underline text-sm">
-            Already have an account? Login
+        <div class="register-footer">
+          <router-link to="/login" class="link">
+            Already have an account? Sign in
           </router-link>
         </div>
       </form>
@@ -110,7 +107,7 @@ async function handleRegister() {
   const result = await authStore.register(formData.value)
 
   if (result.success) {
-    success.value = 'Registration successful! Redirecting to login...'
+    success.value = 'Registration successful! Redirecting...'
     setTimeout(() => {
       router.push('/login')
     }, 2000)
@@ -121,3 +118,105 @@ async function handleRegister() {
   loading.value = false
 }
 </script>
+
+<style scoped>
+.register-page {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-alt);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.register-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.register-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.error-message {
+  padding: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
+
+.success-message {
+  padding: 0.75rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  color: var(--color-success);
+  font-size: 0.875rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.register-footer {
+  text-align: center;
+  padding-top: var(--spacing-sm);
+}
+
+.link {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.link:hover {
+  color: var(--color-text);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
