@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL = '' // import.meta.env.VITE_API_BASE_URL || ''
 
 // Create axios instances for admin and portal
 export const adminApi = axios.create({
@@ -50,7 +50,10 @@ adminApi.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Clear all admin auth data
             localStorage.removeItem('admin_token')
+            localStorage.removeItem('admin_user')
+            // Redirect to login
             window.location.href = '/admin/login'
         }
         return Promise.reject(error)
@@ -62,7 +65,10 @@ portalApi.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Clear all portal auth data
             localStorage.removeItem('portal_token')
+            localStorage.removeItem('portal_user')
+            // Redirect to login
             window.location.href = '/login'
         }
         return Promise.reject(error)

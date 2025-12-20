@@ -75,7 +75,7 @@ class CategoriesSeeder extends Seeder
             ],
         ];
 
-        $this->db->table('categories')->insertBatch($data);
+        $this->db->table('categories')->ignore(true)->insertBatch($data);
 
         echo "Categories seeded successfully!\n";
     }

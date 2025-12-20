@@ -3,12 +3,14 @@ import { ref, computed } from 'vue'
 import { portalService } from '@/services/portalService'
 
 export const usePortalAuthStore = defineStore('portalAuth', () => {
-  const user = ref<any>(null)
+  // Initialize from localStorage
+  const storedUser = localStorage.getItem('portal_user')
+  const user = ref<any>(storedUser ? JSON.parse(storedUser) : null)
   const token = ref<string | null>(localStorage.getItem('portal_token'))
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  const isAuthenticated = computed(() => !!token.value)
+  const isAuthenticated = computed(() => !!token.value && !!user.value)
 
   async function register(data: any) {
     loading.value = true
@@ -35,7 +37,10 @@ export const usePortalAuthStore = defineStore('portalAuth', () => {
 
       user.value = userData
       token.value = authToken
+
+      // Persist to localStorage
       localStorage.setItem('portal_token', authToken)
+      localStorage.setItem('portal_user', JSON.stringify(userData))
 
       return { success: true }
     } catch (err: any) {
@@ -52,10 +57,20 @@ export const usePortalAuthStore = defineStore('portalAuth', () => {
     } catch (err) {
       console.error('Logout error:', err)
     } finally {
+      // Clear state and localStorage
       user.value = null
       token.value = null
       localStorage.removeItem('portal_token')
+      localStorage.removeItem('portal_user')
     }
+  }
+
+  // Clear auth state (for use by axios interceptor on 401)
+  function clearAuth() {
+    user.value = null
+    token.value = null
+    localStorage.removeItem('portal_token')
+    localStorage.removeItem('portal_user')
   }
 
   async function fetchProfile() {
@@ -64,13 +79,22 @@ export const usePortalAuthStore = defineStore('portalAuth', () => {
     try {
       const response = await portalService.getProfile()
       user.value = response.data.data
+      // Update localStorage with fresh profile data
+      localStorage.setItem('portal_user', JSON.stringify(response.data.data))
     } catch (err) {
       console.error('Fetch profile error:', err)
+      // If unauthorized, clear auth
+      if ((err as any)?.response?.status === 401) {
+        clearAuth()
+      }
     }
   }
 
   function setUser(userData: any) {
     user.value = userData
+    if (userData) {
+      localStorage.setItem('portal_user', JSON.stringify(userData))
+    }
   }
 
   return {
@@ -83,6 +107,7 @@ export const usePortalAuthStore = defineStore('portalAuth', () => {
     login,
     logout,
     fetchProfile,
-    setUser
+    setUser,
+    clearAuth
   }
 })

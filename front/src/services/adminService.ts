@@ -4,6 +4,7 @@ export const adminService = {
   // Auth
   login: (email: string, password: string) =>
     adminApi.post('/auth/login', { email, password }),
+  logout: () => adminApi.post('/auth/logout'),
 
   // Users
   getUsers: (params?: any) => adminApi.get('/users', { params }),

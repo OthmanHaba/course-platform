@@ -101,6 +101,20 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
+        // Use custom API exception handler for API routes
+        $request = service('request');
+        $uri = (string) $request->getUri();
+
+        // Check if this is an API request (admin or portal routes)
+        if (
+            str_contains($uri, '/admin/') ||
+            str_contains($uri, '/portal/') ||
+            $request->isAJAX()
+        ) {
+            return new \App\Libraries\ApiExceptionHandler($this);
+        }
+
+        // Use default handler for web routes
         return new ExceptionHandler($this);
     }
 }

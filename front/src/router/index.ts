@@ -26,7 +26,7 @@ const router = createRouter({
             path: '/admin/login',
             name: 'AdminLogin',
             component: AdminLogin,
-            meta: { requiresGuest: true, isAdmin: true }
+            meta: { requiresGuest: true, isAdmin: true },
         },
         {
             path: '/admin',
@@ -35,39 +35,39 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    redirect: '/admin/dashboard'
+                    redirect: '/admin/dashboard',
                 },
                 {
                     path: 'dashboard',
                     name: 'AdminDashboard',
-                    component: AdminDashboard
+                    component: AdminDashboard,
                 },
                 {
                     path: 'courses',
                     name: 'AdminCourses',
-                    component: AdminCourses
+                    component: AdminCourses,
                 },
                 {
                     path: 'users',
                     name: 'AdminUsers',
-                    component: () => import('@/views/admin/Users.vue')
+                    component: () => import('@/views/admin/Users.vue'),
                 },
                 {
                     path: 'enrollments',
                     name: 'AdminEnrollments',
-                    component: () => import('@/views/admin/Enrollments.vue')
+                    component: () => import('@/views/admin/Enrollments.vue'),
                 },
                 {
                     path: 'reviews',
                     name: 'AdminReviews',
-                    component: () => import('@/views/admin/Reviews.vue')
+                    component: () => import('@/views/admin/Reviews.vue'),
                 },
                 {
                     path: 'categories',
                     name: 'AdminCategories',
-                    component: () => import('@/views/admin/Categories.vue')
-                }
-            ]
+                    component: () => import('@/views/admin/Categories.vue'),
+                },
+            ],
         },
 
         // Portal Routes
@@ -75,13 +75,13 @@ const router = createRouter({
             path: '/login',
             name: 'Login',
             component: PortalLogin,
-            meta: { requiresGuest: true }
+            meta: { requiresGuest: true },
         },
         {
             path: '/register',
             name: 'Register',
             component: PortalRegister,
-            meta: { requiresGuest: true }
+            meta: { requiresGuest: true },
         },
         {
             path: '/',
@@ -90,44 +90,44 @@ const router = createRouter({
                 {
                     path: '',
                     name: 'Home',
-                    component: PortalHome
+                    component: PortalHome,
                 },
                 {
                     path: 'courses',
                     name: 'Courses',
-                    component: () => import('@/views/portal/Courses.vue')
+                    component: () => import('@/views/portal/Courses.vue'),
                 },
                 {
                     path: 'courses/:id',
                     name: 'CourseDetail',
-                    component: CourseDetail
+                    component: CourseDetail,
                 },
                 {
                     path: 'my-courses',
                     name: 'MyCourses',
                     component: MyCourses,
-                    meta: { requiresAuth: true }
+                    meta: { requiresAuth: true },
                 },
                 {
                     path: 'learn/:courseId',
                     name: 'Learn',
                     component: () => import('@/views/portal/Learn.vue'),
-                    meta: { requiresAuth: true }
+                    meta: { requiresAuth: true },
                 },
                 {
                     path: 'profile',
                     name: 'Profile',
                     component: () => import('@/views/portal/Profile.vue'),
-                    meta: { requiresAuth: true }
+                    meta: { requiresAuth: true },
                 },
                 {
                     path: 'categories/:id',
                     name: 'CategoryCourses',
-                    component: () => import('@/views/portal/CategoryCourses.vue')
-                }
-            ]
-        }
-    ]
+                    component: () => import('@/views/portal/CategoryCourses.vue'),
+                },
+            ],
+        },
+    ],
 })
 
 // Navigation guards

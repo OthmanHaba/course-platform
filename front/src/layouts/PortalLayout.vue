@@ -7,6 +7,10 @@
           LMS
         </router-link>
 
+         <router-link to="/admin" class="logo">
+          Admin
+        </router-link>
+
         <div class="nav-links">
           <router-link to="/" class="nav-item">Home</router-link>
           <router-link to="/courses" class="nav-item">Courses</router-link>

@@ -27,6 +27,14 @@ class UserModel extends Model
         'reset_token_expires'
     ];
 
+    // Hide sensitive fields from API responses
+    protected $hidden = [
+        'password',
+        'verification_token',
+        'reset_token',
+        'reset_token_expires'
+    ];
+
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
@@ -63,5 +71,26 @@ class UserModel extends Model
             $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
         }
         return $data;
+    }
+
+    /**
+     * Remove sensitive fields from user data before sending to client
+     * Call this manually in controllers after authentication/processing
+     */
+    public function sanitizeUser(array &$user): void
+    {
+        foreach ($this->hidden as $field) {
+            unset($user[$field]);
+        }
+    }
+
+    /**
+     * Sanitize multiple users
+     */
+    public function sanitizeUsers(array &$users): void
+    {
+        foreach ($users as &$user) {
+            $this->sanitizeUser($user);
+        }
     }
 }

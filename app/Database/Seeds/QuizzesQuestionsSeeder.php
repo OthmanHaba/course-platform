@@ -11,29 +11,29 @@ class QuizzesQuestionsSeeder extends Seeder
         // Quizzes
         $quizzes = [
             [
-                'section_id' => 2,
+                'lesson_id' => 1,
                 'title' => 'HTML Fundamentals Quiz',
                 'description' => 'Test your knowledge of HTML basics',
-                'passing_score' => 70,
-                'order_index' => 4,
+                'pass_percentage' => 70,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'section_id' => 3,
+                'lesson_id' => 4,
                 'title' => 'CSS Basics Quiz',
                 'description' => 'Check your understanding of CSS fundamentals',
-                'passing_score' => 70,
-                'order_index' => 4,
+                'pass_percentage' => 70,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'section_id' => 5,
+                'lesson_id' => 7,
                 'title' => 'Python Basics Quiz',
                 'description' => 'Test your Python fundamentals',
-                'passing_score' => 75,
-                'order_index' => 4,
+                'pass_percentage' => 75,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -45,7 +45,7 @@ class QuizzesQuestionsSeeder extends Seeder
         $questions = [
             [
                 'quiz_id' => 1,
-                'question' => 'What does HTML stand for?',
+                'question_text' => 'What does HTML stand for?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode([
                     'Hyper Text Markup Language',
@@ -61,7 +61,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 1,
-                'question' => 'Which tag is used to create a hyperlink?',
+                'question_text' => 'Which tag is used to create a hyperlink?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['<link>', '<a>', '<href>', '<hyperlink>']),
                 'correct_answer' => json_encode(['<a>']),
@@ -72,7 +72,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 1,
-                'question' => 'Which tag is used for the largest heading?',
+                'question_text' => 'Which tag is used for the largest heading?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['<heading>', '<h6>', '<h1>', '<head>']),
                 'correct_answer' => json_encode(['<h1>']),
@@ -83,18 +83,18 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 1,
-                'question' => 'Select all self-closing tags',
+                'question_text' => 'Select all self-closing tags',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['<img>', '<br>', '<input>', '<div>']),
                 'correct_answer' => json_encode(['<img>', '<br>', '<input>']),
                 'points' => 15,
-                'order_index' => 4,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
                 'quiz_id' => 1,
-                'question' => 'HTML is a programming language',
+                'question_text' => 'HTML is a programming language',
                 'question_type' => 'true_false',
                 'options' => json_encode(['True', 'False']),
                 'correct_answer' => json_encode(['False']),
@@ -107,7 +107,7 @@ class QuizzesQuestionsSeeder extends Seeder
             // Questions for Quiz 2 (CSS Basics)
             [
                 'quiz_id' => 2,
-                'question' => 'What does CSS stand for?',
+                'question_text' => 'What does CSS stand for?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode([
                     'Cascading Style Sheets',
@@ -123,7 +123,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 2,
-                'question' => 'Which CSS property controls text size?',
+                'question_text' => 'Which CSS property controls text size?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['text-size', 'font-size', 'text-style', 'font-weight']),
                 'correct_answer' => json_encode(['font-size']),
@@ -134,7 +134,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 2,
-                'question' => 'How do you select an element with id "header"?',
+                'question_text' => 'How do you select an element with id "header"?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['#header', '.header', 'header', '*header']),
                 'correct_answer' => json_encode(['#header']),
@@ -145,12 +145,12 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 2,
-                'question' => 'CSS can only be written in external files',
+                'question_text' => 'CSS can only be written in external files',
                 'question_type' => 'true_false',
                 'options' => json_encode(['True', 'False']),
                 'correct_answer' => json_encode(['False']),
                 'points' => 10,
-                'order_index' => 4,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -158,7 +158,7 @@ class QuizzesQuestionsSeeder extends Seeder
             // Questions for Quiz 3 (Python Basics)
             [
                 'quiz_id' => 3,
-                'question' => 'Which of the following is the correct way to create a variable in Python?',
+                'question_text' => 'Which of the following is the correct way to create a variable in Python?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode([
                     'int x = 5',
@@ -174,7 +174,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 3,
-                'question' => 'What is the output of: print(type([]))?',
+                'question_text' => 'What is the output of: print(type([]))?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode([
                     '<class \'list\'>',
@@ -190,7 +190,7 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 3,
-                'question' => 'Python is case-sensitive',
+                'question_text' => 'Python is case-sensitive',
                 'question_type' => 'true_false',
                 'options' => json_encode(['True', 'False']),
                 'correct_answer' => json_encode(['True']),
@@ -201,12 +201,12 @@ class QuizzesQuestionsSeeder extends Seeder
             ],
             [
                 'quiz_id' => 3,
-                'question' => 'Which are valid Python data types?',
+                'question_text' => 'Which are valid Python data types?',
                 'question_type' => 'multiple_choice',
                 'options' => json_encode(['int', 'string', 'float', 'bool', 'char']),
                 'correct_answer' => json_encode(['int', 'float', 'bool']),
                 'points' => 15,
-                'order_index' => 4,
+                // 'order_index' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

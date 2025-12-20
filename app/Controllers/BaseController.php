@@ -42,4 +42,73 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
     }
+
+    /**
+     * Log an error with detailed context
+     */
+    protected function logError(\Throwable $e, array $context = [])
+    {
+        $message = sprintf(
+            'ERROR: %s in %s:%d',
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        );
+
+        log_message('error', $message);
+        log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+
+        if (!empty($context)) {
+            log_message('error', 'Context: ' . json_encode($context));
+        }
+    }
+
+    /**
+     * Return a standardized error response
+     */
+    protected function errorResponse(
+        string $message,
+        int $statusCode = ResponseInterface::HTTP_INTERNAL_SERVER_ERROR,
+        array $errors = [],
+        \Throwable $exception = null
+    ) {
+        $data = [
+            'status' => 'error',
+            'message' => $message
+        ];
+
+        if (!empty($errors)) {
+            $data['errors'] = $errors;
+        }
+
+        // Add debug info in development mode
+        if ((ENVIRONMENT === 'development' || ENVIRONMENT === 'testing') && $exception) {
+            $data['debug'] = [
+                'exception' => get_class($exception),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => explode("\n", $exception->getTraceAsString())
+            ];
+        }
+
+        return $this->response->setJSON($data)->setStatusCode($statusCode);
+    }
+
+    /**
+     * Return a standardized success response
+     */
+    protected function successResponse($data = null, string $message = 'Success', int $statusCode = ResponseInterface::HTTP_OK)
+    {
+        $response = [
+            'status' => 'success',
+            'message' => $message
+        ];
+
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+
+        return $this->response->setJSON($response)->setStatusCode($statusCode);
+    }
 }

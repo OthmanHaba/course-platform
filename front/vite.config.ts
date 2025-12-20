@@ -18,4 +18,16 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         },
     },
+    server: {
+        proxy: {
+            '/admin': {
+                target: 'http://localhost:8080',
+                changeOrigin: true,
+            },
+            '/portal': {
+                target: 'http://localhost:8080',
+                changeOrigin: true,
+            },
+        },
+    },
 })

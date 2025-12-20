@@ -118,7 +118,7 @@ class UsersSeeder extends Seeder
             ],
         ];
 
-        $this->db->table('users')->insertBatch($data);
+        $this->db->table('users')->ignore(true)->insertBatch($data);
 
         echo "Users seeded successfully!\n";
         echo "Admin: admin@example.com / admin123\n";

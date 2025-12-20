@@ -4,16 +4,18 @@ namespace App\Controllers\Portal;
 
 use App\Controllers\BaseController;
 use App\Models\UserModel;
+use App\Models\AccessTokenModel;
 use CodeIgniter\HTTP\ResponseInterface;
-use Firebase\JWT\JWT;
 
 class AuthController extends BaseController
 {
     protected $userModel;
+    protected $tokenModel;
 
     public function __construct()
     {
         $this->userModel = new UserModel();
+        $this->tokenModel = new AccessTokenModel();
     }
 
     public function register()
@@ -45,7 +47,8 @@ class AuthController extends BaseController
         $userId = $this->userModel->insert($data);
         $user = $this->userModel->find($userId);
 
-        unset($user['password']);
+        // Remove sensitive data from user object
+        $this->userModel->sanitizeUser($user);
 
         return $this->response->setJSON([
             'status'  => 'success',
@@ -69,8 +72,10 @@ class AuthController extends BaseController
             ])->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $email    = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        // Support both JSON and form data
+        $jsonData = $this->request->getJSON(true) ?? [];
+        $email = $this->request->getPost('email') ?? $jsonData['email'] ?? null;
+        $password = $this->request->getPost('password') ?? $jsonData['password'] ?? null;
 
         $user = $this->userModel->where('email', $email)->first();
 
@@ -81,11 +86,13 @@ class AuthController extends BaseController
             ])->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
+
+
         if (!password_verify($password, $user['password'])) {
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Invalid credentials'
-            ])->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+            ])->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST);
         }
 
         if (!$user['is_active']) {
@@ -95,25 +102,47 @@ class AuthController extends BaseController
             ])->setStatusCode(ResponseInterface::HTTP_FORBIDDEN);
         }
 
-        $token = $this->generateToken($user);
+        // Generate access token (expires in 30 days)
+        $tokenData = $this->tokenModel->createToken(
+            $user['id'],
+            'portal-access',
+            ['*'],
+            30
+        );
 
-        unset($user['password']);
+        if (!$tokenData) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Failed to generate access token'
+            ])->setStatusCode(ResponseInterface::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // Remove sensitive data from user object
+        $this->userModel->sanitizeUser($user);
 
         return $this->response->setJSON([
             'status'  => 'success',
             'message' => 'Login successful',
             'data'    => [
                 'user'  => $user,
-                'token' => $token
+                'token' => $tokenData['plain_text_token']
             ]
         ]);
     }
 
     public function logout()
     {
+        // Get token from Authorization header
+        $authHeader = $this->request->getHeaderLine('Authorization');
+
+        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+            $token = $matches[1];
+            $this->tokenModel->revokeToken($token);
+        }
+
         return $this->response->setJSON([
             'status'  => 'success',
-            'message' => 'Logout successful'
+            'message' => 'Logged out successfully'
         ]);
     }
 
@@ -213,19 +242,4 @@ class AuthController extends BaseController
         ]);
     }
 
-    private function generateToken($user)
-    {
-        $key = getenv('JWT_SECRET') ?: 'your-secret-key';
-        $payload = [
-            'iss' => base_url(),
-            'aud' => base_url(),
-            'iat' => time(),
-            'exp' => time() + (60 * 60 * 24 * 7),
-            'sub' => $user['id'],
-            'email' => $user['email'],
-            'user_type' => $user['user_type']
-        ];
-
-        return JWT::encode($payload, $key, 'HS256');
-    }
 }
