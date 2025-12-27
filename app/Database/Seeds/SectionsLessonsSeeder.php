@@ -207,7 +207,7 @@ class SectionsLessonsSeeder extends Seeder
                 'content' => 'Interacting with HTML elements using JavaScript',
                 'video_url' => 'https://example.com/videos/dom-manipulation.mp4',
                 'video_duration' => 840,
-                //  'order_index' => 3,
+                'order_number' => 3,
                 'is_preview' => 0,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -304,7 +304,7 @@ class SectionsLessonsSeeder extends Seeder
             ],
         ];
 
-        $this->db->table('lessons')->insertBatch(array_slice($lessons, 0, 9));
+        $this->db->table('lessons')->insertBatch($lessons);
 
         echo "Sections and Lessons seeded successfully!\n";
     }
