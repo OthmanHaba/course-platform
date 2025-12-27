@@ -1,19 +1,28 @@
 <template>
-  <div class="courses-page">
-    <div class="container">
-      <header class="page-header">
-        <h1>All Courses</h1>
-      </header>
+  <div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">All Courses</h1>
+        <p class="mt-2 text-gray-600">Explore our comprehensive course catalog</p>
+      </div>
 
-      <div class="filters">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search courses..."
-          class="input search-input"
-          @keyup.enter="searchCourses"
-        />
-        <select v-model="selectedLevel" @change="filterCourses" class="input">
+      <!-- Filters -->
+      <div class="mb-8 flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search courses..."
+            @keyup.enter="searchCourses"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+        <select
+          v-model="selectedLevel"
+          @change="filterCourses"
+          class="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+        >
           <option value="">All Levels</option>
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
@@ -21,36 +30,61 @@
         </select>
       </div>
 
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading courses...</p>
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-20">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600"></div>
+        <p class="mt-4 text-gray-600">Loading courses...</p>
       </div>
 
-      <div v-else-if="courses.length === 0" class="empty-state">
-        <p class="text-muted">No courses found</p>
+      <!-- Empty State -->
+      <div v-else-if="courses.length === 0" class="text-center py-20">
+        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">No courses found</h3>
+        <p class="mt-2 text-gray-500">Try adjusting your search or filters</p>
       </div>
 
-      <div v-else class="courses-grid">
+      <!-- Courses Grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div
           v-for="course in courses"
           :key="course.id"
-          class="course-card"
           @click="router.push(`/courses/${course.id}`)"
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
         >
-          <img
-            :src="course.thumbnail || 'https://via.placeholder.com/400x250'"
-            :alt="course.title"
-            class="course-image"
-          />
-          <div class="course-content">
-            <h3 class="course-title">{{ course.title }}</h3>
-            <p class="course-description">{{ course.short_description }}</p>
-            <div class="course-footer">
-              <span class="text-sm text-muted">
-                {{ course.rating_average ? `★ ${course.rating_average}` : '—' }}
-              </span>
-              <span class="course-price">
+          <div class="relative overflow-hidden">
+            <img
+              :src="course.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop'"
+              :alt="course.title"
+              class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div v-if="course.is_free" class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+              FREE
+            </div>
+            <div v-if="course.level" class="absolute top-2 left-2 bg-gray-900 bg-opacity-75 text-white text-xs font-medium px-2 py-1 rounded">
+              {{ course.level }}
+            </div>
+          </div>
+
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+              {{ course.title }}
+            </h3>
+            <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+              {{ course.short_description }}
+            </p>
+
+            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+              <div class="flex items-center text-sm text-gray-600">
+                <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span>{{ course.rating_average || 'New' }}</span>
+              </div>
+              <div class="text-lg font-bold text-gray-900">
                 {{ course.is_free ? 'Free' : `$${course.price}` }}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -101,115 +135,3 @@ function filterCourses() {
   fetchCourses()
 }
 </script>
-
-<style scoped>
-.courses-page {
-  min-height: calc(100vh - 64px);
-  padding: var(--spacing-2xl) 0;
-}
-
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-lg);
-}
-
-.page-header {
-  margin-bottom: var(--spacing-2xl);
-}
-
-.page-header h1 {
-  font-size: 1.875rem;
-  font-weight: 600;
-}
-
-.filters {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-2xl);
-}
-
-.search-input {
-  flex: 1;
-}
-
-.loading-state,
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--spacing-xl);
-}
-
-.course-card {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.course-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.course-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  background: var(--color-background-alt);
-}
-
-.course-content {
-  padding: var(--spacing-lg);
-}
-
-.course-title {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-sm);
-  line-height: 1.4;
-}
-
-.course-description {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin-bottom: var(--spacing-md);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.5;
-}
-
-.course-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid var(--color-border);
-}
-
-.course-price {
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-@media (max-width: 768px) {
-  .filters {
-    flex-direction: column;
-  }
-
-  .courses-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--spacing-lg);
-  }
-}
-</style>
