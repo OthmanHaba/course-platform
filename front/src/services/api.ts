@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = '' // import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE_URL = 'http://localhost:8080' // import.meta.env.VITE_API_BASE_URL || ''
 
 // Create axios instances for admin and portal
 export const adminApi = axios.create({
@@ -13,7 +13,8 @@ export const adminApi = axios.create({
 export const portalApi = axios.create({
     baseURL: `${API_BASE_URL}/portal`,
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Allow-Origin': '*'
     }
 })
 

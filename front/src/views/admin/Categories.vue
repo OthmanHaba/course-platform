@@ -2,10 +2,20 @@
   <div class="categories-page">
     <header class="page-header">
       <h1>Categories</h1>
-      <button @click="showCreateModal = true" class="btn btn-primary">
+      <button @click="openCreateModal" class="btn btn-primary">
         Add Category
       </button>
     </header>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search categories..."
+        class="input search-input"
+      />
+    </div>
 
     <div class="categories-table-container">
       <div v-if="loading" class="loading-state">
@@ -23,7 +33,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="category in categories" :key="category.id">
+            <tr v-for="category in filteredCategories" :key="category.id">
               <td class="category-name">{{ category.name }}</td>
               <td class="text-muted">{{ category.slug }}</td>
               <td>
@@ -32,33 +42,41 @@
                 </span>
               </td>
               <td>
-                <button @click="deleteCategory(category.id)" class="action-btn delete">
-                  Delete
-                </button>
+                <div class="action-buttons">
+                  <button @click="openEditModal(category)" class="action-btn edit">
+                    Edit
+                  </button>
+                  <button @click="toggleStatus(category)" class="action-btn">
+                    {{ category.is_active ? 'Deactivate' : 'Activate' }}
+                  </button>
+                  <button @click="deleteCategory(category.id)" class="action-btn delete">
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
 
-        <div v-if="categories.length === 0" class="empty-state">
+        <div v-if="filteredCategories.length === 0" class="empty-state">
           <p class="text-muted">No categories found</p>
         </div>
       </div>
     </div>
 
-    <!-- Create Modal -->
+    <!-- Create/Edit Modal -->
     <div
-      v-if="showCreateModal"
+      v-if="showModal"
       class="modal-overlay"
-      @click="showCreateModal = false"
+      @click="closeModal"
     >
       <div class="modal-content" @click.stop>
-        <h2 class="modal-title">Create Category</h2>
-        <form @submit.prevent="createCategory">
+        <h2 class="modal-title">{{ editingCategory ? 'Edit Category' : 'Create Category' }}</h2>
+        <form @submit.prevent="saveCategory">
           <div class="form-group">
             <label class="form-label">Name</label>
             <input
-              v-model="newCategory.name"
+              v-model="categoryForm.name"
               type="text"
               required
               class="input"
@@ -67,17 +85,25 @@
           <div class="form-group">
             <label class="form-label">Slug</label>
             <input
-              v-model="newCategory.slug"
+              v-model="categoryForm.slug"
               type="text"
               required
               class="input"
             />
           </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="categoryForm.is_active" />
+              Active
+            </label>
+          </div>
           <div class="modal-actions">
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="submit" :disabled="saving" class="btn btn-primary">
+              {{ saving ? 'Saving...' : (editingCategory ? 'Update' : 'Create') }}
+            </button>
             <button
               type="button"
-              @click="showCreateModal = false"
+              @click="closeModal"
               class="btn btn-outline"
             >
               Cancel
@@ -90,13 +116,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { adminService } from '@/services/adminService'
 
 const categories = ref<any[]>([])
 const loading = ref(true)
-const showCreateModal = ref(false)
-const newCategory = ref({ name: '', slug: '' })
+const saving = ref(false)
+const showModal = ref(false)
+const editingCategory = ref<any>(null)
+const searchQuery = ref('')
+
+const categoryForm = reactive({
+  name: '',
+  slug: '',
+  is_active: true
+})
+
+const filteredCategories = computed(() => {
+  if (!searchQuery.value) return categories.value
+  const query = searchQuery.value.toLowerCase()
+  return categories.value.filter(
+    c => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query)
+  )
+})
 
 onMounted(async () => {
   await fetchCategories()
@@ -105,7 +147,7 @@ onMounted(async () => {
 async function fetchCategories() {
   try {
     const response = await adminService.getCategories()
-    categories.value = response.data.data
+    categories.value = response.data.data || []
   } catch (error) {
     console.error('Failed to fetch categories:', error)
   } finally {
@@ -113,15 +155,55 @@ async function fetchCategories() {
   }
 }
 
-async function createCategory() {
+function openCreateModal() {
+  editingCategory.value = null
+  categoryForm.name = ''
+  categoryForm.slug = ''
+  categoryForm.is_active = true
+  showModal.value = true
+}
+
+function openEditModal(category: any) {
+  editingCategory.value = category
+  categoryForm.name = category.name
+  categoryForm.slug = category.slug
+  categoryForm.is_active = category.is_active
+  showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+  editingCategory.value = null
+}
+
+async function saveCategory() {
+  saving.value = true
   try {
-    await adminService.createCategory(newCategory.value)
-    showCreateModal.value = false
-    newCategory.value = { name: '', slug: '' }
+    if (editingCategory.value) {
+      await adminService.updateCategory(editingCategory.value.id, categoryForm)
+    } else {
+      await adminService.createCategory(categoryForm)
+    }
+    closeModal()
+    await fetchCategories()
+  } catch (error: any) {
+    console.error('Failed to save category:', error)
+    alert(error.response?.data?.message || 'Failed to save category')
+  } finally {
+    saving.value = false
+  }
+}
+
+async function toggleStatus(category: any) {
+  try {
+    await adminService.updateCategory(category.id, {
+      ...category,
+      is_active: !category.is_active
+    })
     await fetchCategories()
   } catch (error) {
-    console.error('Failed to create category:', error)
-    alert('Failed to create category')
+    console.error('Failed to update status:', error)
+    alert('Failed to update status')
   }
 }
 
@@ -147,12 +229,45 @@ async function deleteCategory(id: number) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl, 1.5rem);
 }
 
 .page-header h1 {
   font-size: 1.75rem;
   font-weight: 600;
+}
+
+.search-bar {
+  margin-bottom: var(--spacing-lg, 1.5rem);
+}
+
+.search-input {
+  max-width: 300px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn.edit {
+  color: var(--color-primary, #4f46e5);
+}
+
+.action-btn.edit:hover {
+  background: #eef2ff;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 1rem;
+  height: 1rem;
 }
 
 .categories-table-container {

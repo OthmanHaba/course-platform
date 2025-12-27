@@ -40,11 +40,10 @@
         <div
           v-for="enrollment in courses"
           :key="enrollment.id"
-          @click="router.push(`/learn/${enrollment.course_id}`)"
-          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
+          class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all group"
         >
           <!-- Course Thumbnail -->
-          <div class="relative overflow-hidden">
+          <div class="relative overflow-hidden cursor-pointer" @click="router.push(`/learn/${enrollment.course_id}`)">
             <img
               :src="enrollment.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop'"
               :alt="enrollment.title"
@@ -60,7 +59,10 @@
 
           <!-- Course Info -->
           <div class="p-5">
-            <h3 class="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+            <h3
+              @click="router.push(`/learn/${enrollment.course_id}`)"
+              class="font-semibold text-lg text-gray-900 mb-3 line-clamp-2 cursor-pointer hover:text-indigo-600 transition-colors"
+            >
               {{ enrollment.title }}
             </h3>
 
@@ -81,7 +83,7 @@
               </div>
             </div>
 
-            <!-- Status and Action -->
+            <!-- Status and Actions -->
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
               <div class="flex items-center text-sm">
                 <span v-if="enrollment.is_completed" class="flex items-center text-green-600 font-semibold">
@@ -97,9 +99,29 @@
                   In Progress
                 </span>
               </div>
-              <span class="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">
-                {{ enrollment.is_completed ? 'Review' : 'Continue' }} →
-              </span>
+              <div class="flex items-center gap-2">
+                <button
+                  @click.stop="unenrollFromCourse(enrollment.course_id)"
+                  :disabled="unenrolling === enrollment.course_id"
+                  class="text-xs text-gray-500 hover:text-red-600 transition-colors px-2 py-1"
+                  title="Unenroll"
+                >
+                  {{ unenrolling === enrollment.course_id ? '...' : 'Unenroll' }}
+                </button>
+                <span
+                  v-if="enrollment.is_completed"
+                  @click="router.push(`/certificate/${enrollment.course_id}`)"
+                  class="text-sm font-medium text-green-600 hover:text-green-700 cursor-pointer"
+                >
+                  Certificate
+                </span>
+                <span
+                  @click="router.push(`/learn/${enrollment.course_id}`)"
+                  class="text-sm font-medium text-indigo-600 hover:text-indigo-700 cursor-pointer"
+                >
+                  {{ enrollment.is_completed ? 'Review' : 'Continue' }} →
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -137,6 +159,7 @@ const router = useRouter()
 
 const courses = ref<any[]>([])
 const loading = ref(true)
+const unenrolling = ref<number | null>(null)
 
 onMounted(async () => {
   await fetchMyCourses()
@@ -150,6 +173,23 @@ async function fetchMyCourses() {
     console.error('Failed to fetch courses:', error)
   } finally {
     loading.value = false
+  }
+}
+
+async function unenrollFromCourse(courseId: number) {
+  if (!confirm('Are you sure you want to unenroll from this course? Your progress will be lost.')) {
+    return
+  }
+
+  unenrolling.value = courseId
+  try {
+    await portalService.unenrollCourse(courseId)
+    courses.value = courses.value.filter(c => c.course_id !== courseId)
+  } catch (error: any) {
+    console.error('Failed to unenroll:', error)
+    alert(error.response?.data?.message || 'Failed to unenroll from course')
+  } finally {
+    unenrolling.value = null
   }
 }
 </script>

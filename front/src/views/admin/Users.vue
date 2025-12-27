@@ -4,6 +4,27 @@
       <h1>Users</h1>
     </header>
 
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search users..."
+          @keyup.enter="fetchUsers"
+        />
+        <button @click="fetchUsers" class="search-btn">Search</button>
+      </div>
+      <div class="filter-group">
+        <select v-model="typeFilter" @change="fetchUsers">
+          <option value="">All Types</option>
+          <option value="admin">Admin</option>
+          <option value="instructor">Instructor</option>
+          <option value="student">Student</option>
+        </select>
+      </div>
+    </div>
+
     <div class="users-table-container">
       <div v-if="loading" class="loading-state">
         <p class="text-muted">Loading users...</p>
@@ -60,15 +81,22 @@ import { adminService } from '@/services/adminService'
 
 const users = ref<any[]>([])
 const loading = ref(true)
+const searchQuery = ref('')
+const typeFilter = ref('')
 
 onMounted(async () => {
   await fetchUsers()
 })
 
 async function fetchUsers() {
+  loading.value = true
   try {
-    const response = await adminService.getUsers()
-    users.value = response.data.data.users
+    const params: any = {}
+    if (searchQuery.value) params.search = searchQuery.value
+    if (typeFilter.value) params.user_type = typeFilter.value
+
+    const response = await adminService.getUsers(params)
+    users.value = response.data.data.users || []
   } catch (error) {
     console.error('Failed to fetch users:', error)
   } finally {
@@ -105,12 +133,54 @@ async function deleteUser(id: number) {
 }
 
 .page-header {
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl, 1.5rem);
 }
 
 .page-header h1 {
   font-size: 1.75rem;
   font-weight: 600;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.search-btn {
+  padding: 0.5rem 1rem;
+  background: var(--color-background-alt, #f9fafb);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.search-btn:hover {
+  background: var(--color-border, #e5e7eb);
+}
+
+.filter-group select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  min-width: 150px;
 }
 
 .users-table-container {

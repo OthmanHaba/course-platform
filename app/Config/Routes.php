@@ -9,6 +9,9 @@ $routes->get('/', 'Home::index');
 $routes->options('(:any)', static function () {}); // Handle OPTIONS requests
 
 // Admin Routes
+// $routes->group('', ['filter' => 'cors'], static function(RouteCollection $routes) {
+
+
 $routes->group('admin', function ($routes) {
     // Auth (no authentication required)
     $routes->post('auth/login', 'Admin\AuthController::login');
@@ -116,6 +119,7 @@ $routes->group('portal', function ($routes) {
         // Enrollments
         $routes->get('my-courses', 'Portal\EnrollmentController::myCourses');
         $routes->post('courses/(:num)/enroll', 'Portal\EnrollmentController::enroll/$1');
+        $routes->delete('courses/(:num)/unenroll', 'Portal\EnrollmentController::unenroll/$1');
         $routes->get('enrollments/(:num)', 'Portal\EnrollmentController::show/$1');
 
         // Learning
@@ -150,3 +154,7 @@ $routes->group('portal', function ($routes) {
         $routes->delete('notes/(:num)', 'Portal\NoteController::delete/$1');
     });
 });
+$routes->options('admin/(:any)', static function () {});
+$routes->options('portal/(:any)', static function () {});
+
+// });

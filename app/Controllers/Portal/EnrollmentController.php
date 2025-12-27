@@ -125,4 +125,44 @@ class EnrollmentController extends BaseController
             'data'   => $enrollment
         ]);
     }
+
+    public function unenroll($courseId)
+    {
+        $userId = $this->request->user_id ?? null;
+
+        if (!$userId) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Unauthorized'
+            ])->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+        }
+
+        $enrollment = $this->enrollmentModel
+            ->where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if (!$enrollment) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Enrollment not found'
+            ])->setStatusCode(ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Delete the enrollment
+        $this->enrollmentModel->delete($enrollment['id']);
+
+        // Decrease enrollment count on course
+        $course = $this->courseModel->find($courseId);
+        if ($course && $course['enrollment_count'] > 0) {
+            $this->courseModel->update($courseId, [
+                'enrollment_count' => $course['enrollment_count'] - 1
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Successfully unenrolled from the course'
+        ]);
+    }
 }

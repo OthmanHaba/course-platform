@@ -79,6 +79,78 @@
                 </div>
               </div>
 
+              <!-- Write Review Form (for enrolled users) -->
+              <div v-if="enrolled && authStore.isAuthenticated" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h3 class="font-semibold text-gray-900 mb-3">
+                  {{ userReview ? 'Update Your Review' : 'Write a Review' }}
+                </h3>
+
+                <!-- Star Rating -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                  <div class="flex gap-1">
+                    <button
+                      v-for="star in 5"
+                      :key="star"
+                      @click="reviewForm.rating = star"
+                      class="focus:outline-none"
+                    >
+                      <svg
+                        class="w-8 h-8 transition-colors"
+                        :class="star <= reviewForm.rating ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-200'"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Review Text -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                  <textarea
+                    v-model="reviewForm.review_text"
+                    rows="4"
+                    placeholder="Share your experience with this course..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+                  ></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex items-center gap-3">
+                  <button
+                    @click="submitReview"
+                    :disabled="submittingReview || !reviewForm.rating"
+                    class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ submittingReview ? 'Submitting...' : (userReview ? 'Update Review' : 'Submit Review') }}
+                  </button>
+                  <button
+                    v-if="userReview"
+                    @click="deleteUserReview"
+                    :disabled="deletingReview"
+                    class="px-4 py-2 text-red-600 font-medium hover:text-red-700"
+                  >
+                    {{ deletingReview ? 'Deleting...' : 'Delete Review' }}
+                  </button>
+                </div>
+
+                <!-- Review Message -->
+                <p v-if="reviewMessage" class="mt-3 text-sm" :class="reviewError ? 'text-red-600' : 'text-green-600'">
+                  {{ reviewMessage }}
+                </p>
+              </div>
+
+              <!-- Login prompt for non-enrolled users -->
+              <div v-else-if="!authStore.isAuthenticated" class="mb-6 p-4 bg-gray-50 rounded-lg text-center">
+                <p class="text-gray-600">
+                  <router-link to="/login" class="text-indigo-600 hover:underline">Log in</router-link>
+                  to write a review
+                </p>
+              </div>
+
               <div v-if="loadingReviews" class="text-center py-8">
                 <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-200 border-t-indigo-600"></div>
                 <p class="mt-3 text-gray-600 text-sm">Loading reviews...</p>
@@ -224,7 +296,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { portalService } from '@/services/portalService'
 import { usePortalAuthStore } from '@/stores/portalAuth'
@@ -241,11 +313,25 @@ const enrolled = ref(false)
 const enrolling = ref(false)
 const inWishlist = ref(false)
 
+// Review form state
+const userReview = ref<any>(null)
+const reviewForm = reactive({
+  rating: 0,
+  review_text: ''
+})
+const submittingReview = ref(false)
+const deletingReview = ref(false)
+const reviewMessage = ref('')
+const reviewError = ref(false)
+
 const courseId = Number(route.params.id)
 
 onMounted(async () => {
   await fetchCourse()
   await fetchReviews()
+  if (authStore.isAuthenticated) {
+    await checkEnrollmentAndReview()
+  }
 })
 
 async function fetchCourse() {
@@ -267,6 +353,38 @@ async function fetchReviews() {
     console.error('Failed to fetch reviews:', error)
   } finally {
     loadingReviews.value = false
+  }
+}
+
+async function checkEnrollmentAndReview() {
+  try {
+    // Check if user is enrolled
+    const myCoursesResponse = await portalService.getMyCourses()
+    const myCourses = myCoursesResponse.data.data || []
+    enrolled.value = myCourses.some((c: any) => c.course_id === courseId || c.id === courseId)
+
+    // Check if user has already reviewed
+    if (enrolled.value && authStore.user) {
+      const existingReview = reviews.value.find(
+        (r: any) => r.user_id === authStore.user?.id
+      )
+      if (existingReview) {
+        userReview.value = existingReview
+        reviewForm.rating = existingReview.rating
+        reviewForm.review_text = existingReview.review_text || ''
+      }
+    }
+
+    // Check wishlist status
+    try {
+      const wishlistResponse = await portalService.getWishlist()
+      const wishlist = wishlistResponse.data.data || []
+      inWishlist.value = wishlist.some((w: any) => w.course_id === courseId || w.id === courseId)
+    } catch (e) {
+      // Wishlist check failed, ignore
+    }
+  } catch (error) {
+    console.error('Failed to check enrollment:', error)
   }
 }
 
@@ -304,6 +422,65 @@ async function toggleWishlist() {
     }
   } catch (error) {
     console.error('Failed to update wishlist:', error)
+  }
+}
+
+async function submitReview() {
+  if (!reviewForm.rating) {
+    reviewError.value = true
+    reviewMessage.value = 'Please select a rating'
+    return
+  }
+
+  submittingReview.value = true
+  reviewMessage.value = ''
+  reviewError.value = false
+
+  try {
+    if (userReview.value) {
+      // Update existing review
+      await portalService.updateReview(userReview.value.id, {
+        rating: reviewForm.rating,
+        review_text: reviewForm.review_text
+      })
+      reviewMessage.value = 'Review updated successfully!'
+    } else {
+      // Create new review
+      await portalService.createReview(courseId, {
+        rating: reviewForm.rating,
+        review_text: reviewForm.review_text
+      })
+      reviewMessage.value = 'Review submitted successfully! It will appear after approval.'
+    }
+
+    // Refresh reviews
+    await fetchReviews()
+    await checkEnrollmentAndReview()
+  } catch (error: any) {
+    reviewError.value = true
+    reviewMessage.value = error.response?.data?.message || 'Failed to submit review'
+  } finally {
+    submittingReview.value = false
+  }
+}
+
+async function deleteUserReview() {
+  if (!userReview.value || !confirm('Are you sure you want to delete your review?')) return
+
+  deletingReview.value = true
+  try {
+    await portalService.deleteReview(userReview.value.id)
+    userReview.value = null
+    reviewForm.rating = 0
+    reviewForm.review_text = ''
+    reviewMessage.value = 'Review deleted successfully'
+    reviewError.value = false
+    await fetchReviews()
+  } catch (error: any) {
+    reviewError.value = true
+    reviewMessage.value = error.response?.data?.message || 'Failed to delete review'
+  } finally {
+    deletingReview.value = false
   }
 }
 </script>

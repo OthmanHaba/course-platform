@@ -25,10 +25,9 @@ const router = createRouter({
         {
             path: '/admin/login',
             name: 'AdminLogin',
-            component: AdminLogin,
-            meta: { requiresGuest: true, isAdmin: true },
+            component: () => import('@/views/admin/Login.vue')
         },
-        {
+        {˝
             path: '/admin',
             component: AdminLayout,
             meta: { requiresAuth: true, isAdmin: true },
@@ -66,6 +65,16 @@ const router = createRouter({
                     path: 'categories',
                     name: 'AdminCategories',
                     component: () => import('@/views/admin/Categories.vue'),
+                },
+                {
+                    path: 'courses/new',
+                    name: 'AdminCourseCreate',
+                    component: () => import('@/views/admin/CourseEditor.vue'),
+                },
+                {
+                    path: 'courses/:id',
+                    name: 'AdminCourseEdit',
+                    component: () => import('@/views/admin/CourseEditor.vue'),
                 },
             ],
         },
@@ -121,9 +130,26 @@ const router = createRouter({
                     meta: { requiresAuth: true },
                 },
                 {
+                    path: 'wishlist',
+                    name: 'Wishlist',
+                    component: () => import('@/views/portal/Wishlist.vue'),
+                    meta: { requiresAuth: true },
+                },
+                {
+                    path: 'instructors/:id',
+                    name: 'InstructorProfile',
+                    component: () => import('@/views/portal/InstructorProfile.vue'),
+                },
+                {
                     path: 'categories/:id',
                     name: 'CategoryCourses',
                     component: () => import('@/views/portal/CategoryCourses.vue'),
+                },
+                {
+                    path: 'certificate/:courseId',
+                    name: 'Certificate',
+                    component: () => import('@/views/portal/Certificate.vue'),
+                    meta: { requiresAuth: true },
                 },
             ],
         },

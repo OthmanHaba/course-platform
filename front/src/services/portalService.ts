@@ -44,6 +44,7 @@ export const portalService = {
   // Enrollments
   getMyCourses: () => portalApi.get('/my-courses'),
   enrollCourse: (courseId: number) => portalApi.post(`/courses/${courseId}/enroll`),
+  unenrollCourse: (courseId: number) => portalApi.delete(`/courses/${courseId}/unenroll`),
   getEnrollment: (id: number) => portalApi.get(`/enrollments/${id}`),
 
   // Learning
