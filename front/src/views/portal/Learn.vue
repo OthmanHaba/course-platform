@@ -92,10 +92,10 @@
                 </div>
               </div>
               <div v-else>
-                <p class="text-gray-700">{{ note.content }}</p>
+                <p class="text-gray-700">{{ note.note_text }}</p>
                 <div class="flex gap-2 mt-1">
                   <button
-                    @click="editingNoteId = note.id; editNoteContent = note.content"
+                    @click="editingNoteId = note.id; editNoteContent = note.note_text"
                     class="text-xs text-blue-600 hover:underline"
                   >
                     Edit
@@ -478,7 +478,7 @@ async function saveNote() {
 
   savingNote.value = true
   try {
-    await portalService.createNote(currentLesson.value.id, { content: newNoteContent.value })
+    await portalService.createNote(currentLesson.value.id, { note_text  : newNoteContent.value })
     newNoteContent.value = ''
     showNoteForm.value = false
     await fetchNotes()
