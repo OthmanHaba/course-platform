@@ -15,13 +15,13 @@
           type="text"
           placeholder="Search courses..."
           class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          @keyup.enter="fetchCourses"
+          @keyup.enter="searchCourses"
         />
-        <button @click="fetchCourses" class="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors">
+        <button @click="searchCourses" class="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors">
           Search
         </button>
       </div>
-      <select v-model="statusFilter" @change="fetchCourses" class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[150px] focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <select v-model="statusFilter" @change="searchCourses" class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[150px] focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <option value="">All Status</option>
         <option value="draft">Draft</option>
         <option value="published">Published</option>
@@ -83,12 +83,50 @@
           <p class="text-gray-500">No courses found</p>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1" class="px-5 py-4 border-t border-gray-200 flex items-center justify-between">
+        <div class="text-sm text-gray-500">
+          Showing {{ (currentPage - 1) * perPage + 1 }} to {{ Math.min(currentPage * perPage, totalItems) }} of {{ totalItems }} results
+        </div>
+        <div class="flex gap-2">
+          <button
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <template v-for="page in visiblePages" :key="page">
+            <button
+              v-if="page !== '...'"
+              @click="goToPage(page)"
+              :class="[
+                'px-3 py-1.5 text-sm border rounded-md',
+                currentPage === page
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'border-gray-300 hover:bg-gray-50'
+              ]"
+            >
+              {{ page }}
+            </button>
+            <span v-else class="px-2 py-1.5 text-gray-500">...</span>
+          </template>
+          <button
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminService } from '@/services/adminService'
 
@@ -98,6 +136,30 @@ const loading = ref(true)
 const searchQuery = ref('')
 const statusFilter = ref('')
 
+// Pagination
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalItems = ref(0)
+const perPage = ref(5)
+
+const visiblePages = computed(() => {
+  const pages: (number | string)[] = []
+  const total = totalPages.value
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i)
+  } else {
+    if (currentPage.value <= 3) {
+      pages.push(1, 2, 3, 4, '...', total)
+    } else if (currentPage.value >= total - 2) {
+      pages.push(1, '...', total - 3, total - 2, total - 1, total)
+    } else {
+      pages.push(1, '...', currentPage.value - 1, currentPage.value, currentPage.value + 1, '...', total)
+    }
+  }
+  return pages
+})
+
 onMounted(async () => {
   await fetchCourses()
 })
@@ -105,17 +167,34 @@ onMounted(async () => {
 async function fetchCourses() {
   loading.value = true
   try {
-    const params: any = {}
+    const params: any = { page: currentPage.value, per_page: perPage.value }
     if (searchQuery.value) params.search = searchQuery.value
     if (statusFilter.value) params.status = statusFilter.value
 
     const response = await adminService.getCourses(params)
-    courses.value = response.data.data.courses || []
+    const data = response.data.data
+    courses.value = data.courses || []
+    const pagination = data.pagination || {}
+    totalItems.value = pagination.total || 0
+    totalPages.value = pagination.total_pages || 1
+    currentPage.value = pagination.current_page || 1
   } catch (error) {
     console.error('Failed to fetch courses:', error)
   } finally {
     loading.value = false
   }
+}
+
+function goToPage(page: number | string) {
+  if (typeof page === 'number' && page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    fetchCourses()
+  }
+}
+
+function searchCourses() {
+  currentPage.value = 1
+  fetchCourses()
 }
 
 function editCourse(id: number) {

@@ -20,6 +20,16 @@ class AuthController extends BaseController
 
     public function register()
     {
+        // Support both JSON and form data
+        $jsonData = $this->request->getJSON(true) ?? [];
+
+        $inputData = [
+            'email'      => $this->request->getPost('email') ?? $jsonData['email'] ?? null,
+            'password'   => $this->request->getPost('password') ?? $jsonData['password'] ?? null,
+            'first_name' => $this->request->getPost('first_name') ?? $jsonData['first_name'] ?? null,
+            'last_name'  => $this->request->getPost('last_name') ?? $jsonData['last_name'] ?? null,
+        ];
+
         $rules = [
             'email'      => 'required|valid_email|is_unique[users.email]',
             'password'   => 'required|min_length[6]',
@@ -27,7 +37,7 @@ class AuthController extends BaseController
             'last_name'  => 'required|min_length[2]'
         ];
 
-        if (!$this->validate($rules)) {
+        if (!$this->validateData($inputData, $rules)) {
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Validation failed',
@@ -36,10 +46,10 @@ class AuthController extends BaseController
         }
 
         $data = [
-            'email'              => $this->request->getPost('email'),
-            'password'           => $this->request->getPost('password'),
-            'first_name'         => $this->request->getPost('first_name'),
-            'last_name'          => $this->request->getPost('last_name'),
+            'email'              => $inputData['email'],
+            'password'           => $inputData['password'],
+            'first_name'         => $inputData['first_name'],
+            'last_name'          => $inputData['last_name'],
             'user_type'          => 'student',
             'verification_token' => bin2hex(random_bytes(32))
         ];
