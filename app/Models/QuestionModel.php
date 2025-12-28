@@ -26,9 +26,7 @@ class QuestionModel extends Model
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
-    protected array $casts = [
-        'options' => 'json'
-    ];
+    protected array $casts = [];
     protected array $castHandlers = [];
 
     // Dates

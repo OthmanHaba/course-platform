@@ -76,6 +76,16 @@ const router = createRouter({
                     name: 'AdminCourseEdit',
                     component: () => import('@/views/admin/CourseEditor.vue'),
                 },
+                {
+                    path: 'quizzes/new',
+                    name: 'AdminQuizCreate',
+                    component: () => import('@/views/admin/QuizEditor.vue'),
+                },
+                {
+                    path: 'quizzes/:id',
+                    name: 'AdminQuizEdit',
+                    component: () => import('@/views/admin/QuizEditor.vue'),
+                },
             ],
         },
 

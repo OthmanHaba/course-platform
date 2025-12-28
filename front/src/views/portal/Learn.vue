@@ -127,11 +127,11 @@
 
           <!-- Video Content -->
           <div v-if="currentLesson.content_type === 'video' && currentLesson.video_url">
-            <video
+            <iframe
               :src="currentLesson.video_url"
               controls
               class="w-full rounded mb-4"
-            ></video>
+            ></iframe>
           </div>
 
           <!-- Article Content -->
@@ -141,8 +141,8 @@
             class="prose max-w-none mb-6"
           ></div>
 
-          <!-- Quiz Content -->
-          <div v-if="currentLesson.content_type === 'quiz'" class="mb-6">
+          <!-- Quiz Content (show if lesson has a quiz) -->
+          <div v-if="currentLesson.quiz_id" class="mb-6">
             <!-- Quiz Loading -->
             <div v-if="loadingQuiz" class="text-center py-8">
               <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
@@ -151,14 +151,14 @@
 
             <!-- Quiz Result -->
             <div v-else-if="quizResult" class="text-center py-8">
-              <div :class="quizResult.passed ? 'text-green-600' : 'text-red-600'">
+              <div :class="quizResult.is_passed ? 'text-green-600' : 'text-red-600'">
                 <svg class="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                  <path v-if="quizResult.passed" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  <path v-if="quizResult.is_passed" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                   <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <h2 class="text-2xl font-bold mt-4" :class="quizResult.passed ? 'text-green-600' : 'text-red-600'">
-                {{ quizResult.passed ? 'Congratulations!' : 'Try Again' }}
+              <h2 class="text-2xl font-bold mt-4" :class="quizResult.is_passed ? 'text-green-600' : 'text-red-600'">
+                {{ quizResult.is_passed ? 'Congratulations!' : 'Try Again' }}
               </h2>
               <p class="text-xl mt-2">Score: {{ quizResult.score }}%</p>
               <p class="text-gray-600 mt-1">
@@ -286,7 +286,7 @@
           </div>
 
           <!-- Lesson Actions (not for quiz) -->
-          <div v-if="currentLesson.content_type !== 'quiz'" class="flex justify-between items-center mt-6 pt-6 border-t">
+          <div v-if="!currentLesson.quiz_id" class="flex justify-between items-center mt-6 pt-6 border-t">
             <button
               @click="completeLesson"
               :disabled="currentLesson.progress?.is_completed"
@@ -343,7 +343,7 @@ onMounted(async () => {
 // Watch for lesson changes to load quiz and notes
 watch(currentLesson, async (newLesson) => {
   if (newLesson) {
-    if (newLesson.content_type === 'quiz') {
+    if (newLesson.quiz_id) {
       await loadQuiz()
     }
     await fetchNotes()
@@ -386,7 +386,13 @@ async function loadQuiz() {
   loadingQuiz.value = true
   try {
     const response = await portalService.getQuiz(currentLesson.value.quiz_id)
-    quiz.value = response.data.data
+    const data = response.data.data
+    // API returns { quiz: {...}, questions: [...], attempts: n }
+    quiz.value = {
+      ...data.quiz,
+      questions: data.questions,
+      attempts: data.attempts
+    }
   } catch (error) {
     console.error('Failed to load quiz:', error)
   } finally {
@@ -397,9 +403,14 @@ async function loadQuiz() {
 function parseOptions(options: string | any[]): string[] {
   if (Array.isArray(options)) return options
   try {
-    return JSON.parse(options)
+    let parsed = JSON.parse(options)
+    // Handle double-encoded JSON
+    if (typeof parsed === 'string') {
+      parsed = JSON.parse(parsed)
+    }
+    return Array.isArray(parsed) ? parsed : []
   } catch {
-    return options ? options.split(',').map((o: string) => o.trim()) : []
+    return options ? String(options).split(',').map((o: string) => o.trim()) : []
   }
 }
 
@@ -412,7 +423,7 @@ async function submitQuiz() {
     quizResult.value = response.data.data
 
     // Mark lesson as complete if passed
-    if (quizResult.value.passed) {
+    if (quizResult.value.is_passed) {
       await portalService.completeLesson(currentLesson.value.id)
       currentLesson.value.progress = { is_completed: 1 }
       await fetchCurriculum()
@@ -494,7 +505,7 @@ async function updateNote(noteId: number) {
   if (!editNoteContent.value.trim()) return
 
   try {
-    await portalService.updateNote(noteId, { content: editNoteContent.value })
+    await portalService.updateNote(noteId, { note_text: editNoteContent.value })
     editingNoteId.value = null
     await fetchNotes()
   } catch (error) {

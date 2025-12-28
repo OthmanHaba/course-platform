@@ -34,6 +34,7 @@ export const adminService = {
   deleteLesson: (id: number) => adminApi.delete(`/lessons/${id}`),
 
   // Quizzes
+  getQuiz: (id: number) => adminApi.get(`/quizzes/${id}`),
   createQuiz: (lessonId: number, data: any) =>
     adminApi.post(`/lessons/${lessonId}/quizzes`, data),
   updateQuiz: (id: number, data: any) => adminApi.put(`/quizzes/${id}`, data),

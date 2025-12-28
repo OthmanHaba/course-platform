@@ -184,7 +184,7 @@ async function unenrollFromCourse(courseId: number) {
   unenrolling.value = courseId
   try {
     await portalService.unenrollCourse(courseId)
-    courses.value = courses.value.filter(c => c.course_id !== courseId)
+    courses.value = courses.value.filter(c => Number(c.course_id) !== courseId)
   } catch (error: any) {
     console.error('Failed to unenroll:', error)
     alert(error.response?.data?.message || 'Failed to unenroll from course')

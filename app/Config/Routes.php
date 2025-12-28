@@ -45,6 +45,7 @@ $routes->group('admin', function ($routes) {
 
         // Quizzes
         $routes->post('lessons/(:num)/quizzes', 'Admin\QuizController::create/$1');
+        $routes->get('quizzes/(:num)', 'Admin\QuizController::show/$1');
         $routes->put('quizzes/(:num)', 'Admin\QuizController::update/$1');
         $routes->delete('quizzes/(:num)', 'Admin\QuizController::delete/$1');
 

@@ -329,9 +329,7 @@ const courseId = Number(route.params.id)
 onMounted(async () => {
   await fetchCourse()
   await fetchReviews()
-  if (authStore.isAuthenticated) {
-    await checkEnrollmentAndReview()
-  }
+  await checkEnrollmentAndReview()
 })
 
 async function fetchCourse() {
@@ -357,16 +355,25 @@ async function fetchReviews() {
 }
 
 async function checkEnrollmentAndReview() {
+  // Only check if user is authenticated
+  if (!authStore.isAuthenticated) {
+    return
+  }
+
   try {
     // Check if user is enrolled
     const myCoursesResponse = await portalService.getMyCourses()
     const myCourses = myCoursesResponse.data.data || []
-    enrolled.value = myCourses.some((c: any) => c.course_id === courseId || c.id === courseId)
+
+    // Check enrollment - compare as numbers to avoid type mismatch
+    enrolled.value = myCourses.some((c: any) =>
+      Number(c.course_id) === courseId || Number(c.id) === courseId
+    )
 
     // Check if user has already reviewed
     if (enrolled.value && authStore.user) {
       const existingReview = reviews.value.find(
-        (r: any) => r.user_id === authStore.user?.id
+        (r: any) => Number(r.user_id) === Number(authStore.user?.id)
       )
       if (existingReview) {
         userReview.value = existingReview
@@ -379,12 +386,17 @@ async function checkEnrollmentAndReview() {
     try {
       const wishlistResponse = await portalService.getWishlist()
       const wishlist = wishlistResponse.data.data || []
-      inWishlist.value = wishlist.some((w: any) => w.course_id === courseId || w.id === courseId)
+      inWishlist.value = wishlist.some((w: any) =>
+        Number(w.course_id) === courseId || Number(w.id) === courseId
+      )
     } catch (e) {
       // Wishlist check failed, ignore
     }
-  } catch (error) {
-    console.error('Failed to check enrollment:', error)
+  } catch (error: any) {
+    // Only log if it's not a 401 (unauthorized users will get 401)
+    if (error.response?.status !== 401) {
+      console.error('Failed to check enrollment:', error)
+    }
   }
 }
 

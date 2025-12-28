@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\CourseModel;
 use App\Models\SectionModel;
 use App\Models\LessonModel;
+use App\Models\QuizModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class CourseController extends BaseController
@@ -13,12 +14,14 @@ class CourseController extends BaseController
     protected $courseModel;
     protected $sectionModel;
     protected $lessonModel;
+    protected $quizModel;
 
     public function __construct()
     {
         $this->courseModel = new CourseModel();
         $this->sectionModel = new SectionModel();
         $this->lessonModel = new LessonModel();
+        $this->quizModel = new QuizModel();
     }
 
     public function index()
@@ -72,12 +75,22 @@ class CourseController extends BaseController
             ->orderBy('order_number', 'ASC')
             ->findAll();
 
-        // Fetch lessons for each section
+        // Fetch lessons for each section with quiz info
         foreach ($sections as &$section) {
-            $section['lessons'] = $this->lessonModel
+            $lessons = $this->lessonModel
                 ->where('section_id', $section['id'])
                 ->orderBy('order_number', 'ASC')
                 ->findAll();
+
+            // Add quiz info to each lesson
+            foreach ($lessons as &$lesson) {
+                $quiz = $this->quizModel
+                    ->where('lesson_id', $lesson['id'])
+                    ->first();
+                $lesson['quiz_id'] = $quiz ? $quiz['id'] : null;
+            }
+
+            $section['lessons'] = $lessons;
         }
 
         $course['sections'] = $sections;

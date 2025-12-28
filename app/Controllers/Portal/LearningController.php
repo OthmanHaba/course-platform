@@ -8,6 +8,7 @@ use App\Models\CourseModel;
 use App\Models\SectionModel;
 use App\Models\LessonModel;
 use App\Models\ProgressModel;
+use App\Models\QuizModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class LearningController extends BaseController
@@ -17,6 +18,7 @@ class LearningController extends BaseController
     protected $sectionModel;
     protected $lessonModel;
     protected $progressModel;
+    protected $quizModel;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class LearningController extends BaseController
         $this->sectionModel = new SectionModel();
         $this->lessonModel = new LessonModel();
         $this->progressModel = new ProgressModel();
+        $this->quizModel = new QuizModel();
     }
 
     public function curriculum($courseId)
@@ -69,6 +72,10 @@ class LearningController extends BaseController
                     ->first();
 
                 $lesson['is_completed'] = $progress ? $progress['is_completed'] : 0;
+
+                // Add quiz_id if lesson has a quiz
+                $quiz = $this->quizModel->where('lesson_id', $lesson['id'])->first();
+                $lesson['quiz_id'] = $quiz ? $quiz['id'] : null;
             }
 
             $section['lessons'] = $lessons;
@@ -128,6 +135,10 @@ class LearningController extends BaseController
             ->first();
 
         $lesson['progress'] = $progress;
+
+        // Add quiz_id if lesson has a quiz
+        $quiz = $this->quizModel->where('lesson_id', $lessonId)->first();
+        $lesson['quiz_id'] = $quiz ? $quiz['id'] : null;
 
         return $this->response->setJSON([
             'status' => 'success',

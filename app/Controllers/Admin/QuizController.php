@@ -18,6 +18,31 @@ class QuizController extends BaseController
         $this->questionModel = new QuestionModel();
     }
 
+    public function show($id)
+    {
+        $quiz = $this->quizModel->find($id);
+
+        if (!$quiz) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Quiz not found'
+            ])->setStatusCode(ResponseInterface::HTTP_NOT_FOUND);
+        }
+
+        // Fetch questions for this quiz
+        $questions = $this->questionModel
+            ->where('quiz_id', $id)
+            ->orderBy('order_number', 'ASC')
+            ->findAll();
+
+        $quiz['questions'] = $questions;
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data'   => $quiz
+        ]);
+    }
+
     public function create($lessonId)
     {
         $data = $this->request->getJSON(true);

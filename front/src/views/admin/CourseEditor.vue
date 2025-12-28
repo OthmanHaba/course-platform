@@ -299,6 +299,9 @@
                     <button @click="editLesson(lesson)" class="px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 rounded transition-colors">
                       Edit
                     </button>
+                    <button @click="goToQuizEditor(lesson)" class="px-2 py-1 text-xs text-amber-600 hover:bg-amber-50 rounded transition-colors">
+                      Quiz
+                    </button>
                     <button @click="deleteLesson(section.id, lesson.id)" class="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors">
                       Delete
                     </button>
@@ -649,6 +652,22 @@ async function deleteLesson(sectionId: number, lessonId: number) {
     }
   } catch (error: any) {
     alert(error.response?.data?.message || 'Failed to delete lesson')
+  }
+}
+
+function goToQuizEditor(lesson: any) {
+  const query: any = {
+    lessonId: lesson.id,
+    lessonTitle: lesson.title,
+    courseId: courseId.value
+  }
+
+  if (lesson.quiz_id) {
+    // Edit existing quiz
+    router.push({ path: `/admin/quizzes/${lesson.quiz_id}`, query })
+  } else {
+    // Create new quiz
+    router.push({ path: '/admin/quizzes/new', query })
   }
 }
 </script>
