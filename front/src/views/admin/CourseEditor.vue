@@ -556,7 +556,7 @@ async function addSection() {
   try {
     const response = await adminService.createSection(courseId.value!, {
       title: newSection.title,
-      sort_order: sections.value.length
+      order_number: sections.value.length
     })
     sections.value.push({ ...response.data.data, lessons: [] })
     expandedSections.value.push(response.data.data.id)
@@ -602,7 +602,7 @@ async function addLesson(sectionId: number) {
     const response = await adminService.createLesson(sectionId, {
       title: newLesson.title,
       content_type: newLesson.content_type,
-      sort_order: section?.lessons?.length || 0
+      order_number: section?.lessons?.length || 0
     })
 
     if (!section.lessons) section.lessons = []

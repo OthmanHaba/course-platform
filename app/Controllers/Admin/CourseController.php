@@ -4,15 +4,21 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\CourseModel;
+use App\Models\SectionModel;
+use App\Models\LessonModel;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class CourseController extends BaseController
 {
     protected $courseModel;
+    protected $sectionModel;
+    protected $lessonModel;
 
     public function __construct()
     {
         $this->courseModel = new CourseModel();
+        $this->sectionModel = new SectionModel();
+        $this->lessonModel = new LessonModel();
     }
 
     public function index()
@@ -59,6 +65,22 @@ class CourseController extends BaseController
                 'message' => 'Course not found'
             ])->setStatusCode(ResponseInterface::HTTP_NOT_FOUND);
         }
+
+        // Fetch sections with their lessons
+        $sections = $this->sectionModel
+            ->where('course_id', $id)
+            ->orderBy('order_number', 'ASC')
+            ->findAll();
+
+        // Fetch lessons for each section
+        foreach ($sections as &$section) {
+            $section['lessons'] = $this->lessonModel
+                ->where('section_id', $section['id'])
+                ->orderBy('order_number', 'ASC')
+                ->findAll();
+        }
+
+        $course['sections'] = $sections;
 
         return $this->response->setJSON([
             'status' => 'success',
