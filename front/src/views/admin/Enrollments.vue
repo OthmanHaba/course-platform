@@ -1,37 +1,39 @@
 <template>
-  <div class="enrollments-page">
-    <header class="page-header">
-      <h1>Enrollments</h1>
+  <div class="max-w-7xl">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">Enrollments</h1>
     </header>
 
-    <div class="enrollments-table-container">
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading enrollments...</p>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div v-if="loading" class="p-8 text-center">
+        <p class="text-gray-500">Loading enrollments...</p>
       </div>
 
-      <div v-else class="table-wrapper">
-        <table class="data-table">
-          <thead>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th>Student</th>
-              <th>Course</th>
-              <th>Progress</th>
-              <th>Enrolled On</th>
-              <th>Actions</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Progress</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Enrolled On</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="enrollment in enrollments" :key="enrollment.id">
-              <td class="student-name">
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="enrollment in enrollments" :key="enrollment.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-medium text-gray-900">
                 {{ enrollment.first_name }} {{ enrollment.last_name }}
               </td>
-              <td class="text-muted">{{ enrollment.course_title }}</td>
-              <td>
-                <span class="badge badge-progress">{{ Math.round(enrollment.progress_percentage) }}%</span>
+              <td class="px-5 py-4 text-sm text-gray-500">{{ enrollment.course_title }}</td>
+              <td class="px-5 py-4">
+                <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">
+                  {{ Math.round(enrollment.progress_percentage) }}%
+                </span>
               </td>
-              <td class="text-muted">{{ formatDate(enrollment.enrollment_date) }}</td>
-              <td>
-                <button @click="deleteEnrollment(enrollment.id)" class="action-btn delete">
+              <td class="px-5 py-4 text-sm text-gray-500">{{ formatDate(enrollment.enrollment_date) }}</td>
+              <td class="px-5 py-4">
+                <button @click="deleteEnrollment(enrollment.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
                   Remove
                 </button>
               </td>
@@ -39,8 +41,8 @@
           </tbody>
         </table>
 
-        <div v-if="enrollments.length === 0" class="empty-state">
-          <p class="text-muted">No enrollments found</p>
+        <div v-if="enrollments.length === 0" class="p-8 text-center">
+          <p class="text-gray-500">No enrollments found</p>
         </div>
       </div>
     </div>
@@ -85,115 +87,3 @@ function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString()
 }
 </script>
-
-<style scoped>
-.enrollments-page {
-  max-width: 1400px;
-}
-
-.page-header {
-  margin-bottom: var(--spacing-2xl);
-}
-
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.enrollments-table-container {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.loading-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.data-table th {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background: var(--color-background-alt);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.student-name {
-  font-weight: 500;
-}
-
-.badge-progress {
-  background: #e0e7ff;
-  color: #4338ca;
-}
-
-.action-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  color: var(--color-text);
-  background: var(--color-background-alt);
-}
-
-.action-btn.delete:hover {
-  color: var(--color-error);
-  background: #fef2f2;
-}
-
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
-}
-</style>

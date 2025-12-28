@@ -1,55 +1,58 @@
 <template>
-  <div class="categories-page">
-    <header class="page-header">
-      <h1>Categories</h1>
-      <button @click="openCreateModal" class="btn btn-primary">
+  <div class="max-w-7xl">
+    <header class="flex justify-between items-center mb-6 flex-wrap gap-4">
+      <h1 class="text-2xl font-semibold text-gray-900">Categories</h1>
+      <button @click="openCreateModal" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
         Add Category
       </button>
     </header>
 
     <!-- Search -->
-    <div class="search-bar">
+    <div class="mb-6">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search categories..."
-        class="input search-input"
+        class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
       />
     </div>
 
-    <div class="categories-table-container">
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading categories...</p>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div v-if="loading" class="p-8 text-center">
+        <p class="text-gray-500">Loading categories...</p>
       </div>
 
-      <div v-else class="table-wrapper">
-        <table class="data-table">
-          <thead>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th>Name</th>
-              <th>Slug</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="category in filteredCategories" :key="category.id">
-              <td class="category-name">{{ category.name }}</td>
-              <td class="text-muted">{{ category.slug }}</td>
-              <td>
-                <span class="badge" :class="category.is_active ? 'badge-active' : 'badge-inactive'">
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="category in filteredCategories" :key="category.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-medium text-gray-900">{{ category.name }}</td>
+              <td class="px-5 py-4 text-sm text-gray-500">{{ category.slug }}</td>
+              <td class="px-5 py-4">
+                <span
+                  class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full"
+                  :class="category.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                >
                   {{ category.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-              <td>
-                <div class="action-buttons">
-                  <button @click="openEditModal(category)" class="action-btn edit">
+              <td class="px-5 py-4">
+                <div class="flex gap-2">
+                  <button @click="openEditModal(category)" class="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors">
                     Edit
                   </button>
-                  <button @click="toggleStatus(category)" class="action-btn">
+                  <button @click="toggleStatus(category)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
                     {{ category.is_active ? 'Deactivate' : 'Activate' }}
                   </button>
-                  <button @click="deleteCategory(category.id)" class="action-btn delete">
+                  <button @click="deleteCategory(category.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
                     Delete
                   </button>
                 </div>
@@ -58,8 +61,8 @@
           </tbody>
         </table>
 
-        <div v-if="filteredCategories.length === 0" class="empty-state">
-          <p class="text-muted">No categories found</p>
+        <div v-if="filteredCategories.length === 0" class="p-8 text-center">
+          <p class="text-gray-500">No categories found</p>
         </div>
       </div>
     </div>
@@ -67,44 +70,44 @@
     <!-- Create/Edit Modal -->
     <div
       v-if="showModal"
-      class="modal-overlay"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6"
       @click="closeModal"
     >
-      <div class="modal-content" @click.stop>
-        <h2 class="modal-title">{{ editingCategory ? 'Edit Category' : 'Create Category' }}</h2>
-        <form @submit.prevent="saveCategory">
-          <div class="form-group">
-            <label class="form-label">Name</label>
+      <div class="bg-white rounded-xl p-8 max-w-md w-full" @click.stop>
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ editingCategory ? 'Edit Category' : 'Create Category' }}</h2>
+        <form @submit.prevent="saveCategory" class="space-y-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Name</label>
             <input
               v-model="categoryForm.name"
               type="text"
               required
-              class="input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          <div class="form-group">
-            <label class="form-label">Slug</label>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Slug</label>
             <input
               v-model="categoryForm.slug"
               type="text"
               required
-              class="input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="categoryForm.is_active" />
-              Active
+          <div>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" v-model="categoryForm.is_active" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <span class="text-sm text-gray-700">Active</span>
             </label>
           </div>
-          <div class="modal-actions">
-            <button type="submit" :disabled="saving" class="btn btn-primary">
+          <div class="flex gap-3 mt-6">
+            <button type="submit" :disabled="saving" class="flex-1 px-4 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
               {{ saving ? 'Saving...' : (editingCategory ? 'Update' : 'Create') }}
             </button>
             <button
               type="button"
               @click="closeModal"
-              class="btn btn-outline"
+              class="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
@@ -219,209 +222,3 @@ async function deleteCategory(id: number) {
   }
 }
 </script>
-
-<style scoped>
-.categories-page {
-  max-width: 1400px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl, 1.5rem);
-}
-
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.search-bar {
-  margin-bottom: var(--spacing-lg, 1.5rem);
-}
-
-.search-input {
-  max-width: 300px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn.edit {
-  color: var(--color-primary, #4f46e5);
-}
-
-.action-btn.edit:hover {
-  background: #eef2ff;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-label input {
-  width: 1rem;
-  height: 1rem;
-}
-
-.categories-table-container {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.loading-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.data-table th {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background: var(--color-background-alt);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.category-name {
-  font-weight: 500;
-}
-
-.badge-active {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge-inactive {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.action-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  color: var(--color-text);
-  background: var(--color-background-alt);
-}
-
-.action-btn.delete:hover {
-  color: var(--color-error);
-  background: #fef2f2;
-}
-
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: var(--spacing-lg);
-}
-
-.modal-content {
-  background: var(--color-background);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-2xl);
-  max-width: 500px;
-  width: 100%;
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-xl);
-}
-
-.form-group {
-  margin-bottom: var(--spacing-lg);
-}
-
-.form-label {
-  display: block;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--color-text);
-  margin-bottom: var(--spacing-sm);
-}
-
-.modal-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-xl);
-}
-
-.modal-actions .btn {
-  flex: 1;
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-  }
-
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
-}
-</style>

@@ -1,42 +1,53 @@
 <template>
-  <div class="course-editor">
-    <header class="page-header">
-      <div class="header-content">
-        <button @click="router.push('/admin/courses')" class="back-btn">
+  <div class="max-w-6xl">
+    <header class="flex justify-between items-center mb-8 flex-wrap gap-4">
+      <div class="flex flex-col gap-2">
+        <button @click="router.push('/admin/courses')" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
           ← Back to Courses
         </button>
-        <h1>{{ isEditing ? 'Edit Course' : 'Create Course' }}</h1>
+        <h1 class="text-2xl font-semibold text-gray-900">{{ isEditing ? 'Edit Course' : 'Create Course' }}</h1>
       </div>
-      <div class="header-actions">
+      <div class="flex gap-4">
         <button
           v-if="isEditing"
           @click="updateStatus"
-          class="status-btn"
-          :class="`status-${course.status}`"
+          class="px-4 py-2 text-sm font-medium rounded-lg"
+          :class="{
+            'bg-amber-100 text-amber-700': course.status === 'draft',
+            'bg-green-100 text-green-700': course.status === 'published',
+            'bg-gray-100 text-gray-600': course.status === 'archived'
+          }"
         >
           Status: {{ course.status }}
         </button>
-        <button @click="saveCourse" :disabled="saving" class="save-btn">
+        <button @click="saveCourse" :disabled="saving" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {{ saving ? 'Saving...' : 'Save Course' }}
         </button>
       </div>
     </header>
 
-    <div v-if="loading" class="loading-state">
-      <p>Loading...</p>
+    <div v-if="loading" class="text-center py-12">
+      <p class="text-gray-500">Loading...</p>
     </div>
 
-    <div v-else class="editor-content">
-      <!-- Course Details Tab -->
-      <div class="tabs">
+    <div v-else class="space-y-6">
+      <!-- Tabs -->
+      <div class="flex gap-0 border-b border-gray-200">
         <button
-          :class="{ active: activeTab === 'details' }"
+          :class="[
+            'px-6 py-3 font-medium text-sm border-b-2 transition-colors',
+            activeTab === 'details' ? 'text-indigo-600 border-indigo-600' : 'text-gray-500 border-transparent hover:text-gray-700'
+          ]"
           @click="activeTab = 'details'"
         >
           Course Details
         </button>
         <button
-          :class="{ active: activeTab === 'curriculum' }"
+          :class="[
+            'px-6 py-3 font-medium text-sm border-b-2 transition-colors',
+            activeTab === 'curriculum' ? 'text-indigo-600 border-indigo-600' : 'text-gray-500 border-transparent hover:text-gray-700',
+            !isEditing && 'opacity-50 cursor-not-allowed'
+          ]"
           @click="activeTab = 'curriculum'"
           :disabled="!isEditing"
         >
@@ -45,51 +56,51 @@
       </div>
 
       <!-- Details Tab -->
-      <div v-if="activeTab === 'details'" class="tab-content">
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label>Course Title *</label>
+      <div v-if="activeTab === 'details'" class="bg-white border border-gray-200 rounded-xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Course Title *</label>
             <input
               v-model="course.title"
               type="text"
               placeholder="Enter course title"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
-          <div class="form-group full-width">
-            <label>Slug *</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Slug *</label>
             <input
               v-model="course.slug"
               type="text"
               placeholder="course-url-slug"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
-          <div class="form-group full-width">
-            <label>Short Description</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Short Description</label>
             <textarea
               v-model="course.short_description"
               rows="2"
               placeholder="Brief description for course cards"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             ></textarea>
           </div>
 
-          <div class="form-group full-width">
-            <label>Full Description</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Full Description</label>
             <textarea
               v-model="course.description"
               rows="5"
               placeholder="Detailed course description (HTML supported)"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             ></textarea>
           </div>
 
-          <div class="form-group">
-            <label>Category</label>
-            <select v-model="course.category_id" class="form-input">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Category</label>
+            <select v-model="course.category_id" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
               <option value="">Select Category</option>
               <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                 {{ cat.name }}
@@ -97,9 +108,9 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Instructor</label>
-            <select v-model="course.instructor_id" class="form-input">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Instructor</label>
+            <select v-model="course.instructor_id" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
               <option value="">Select Instructor</option>
               <option v-for="inst in instructors" :key="inst.id" :value="inst.id">
                 {{ inst.first_name }} {{ inst.last_name }}
@@ -107,9 +118,9 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Level</label>
-            <select v-model="course.level" class="form-input">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Level</label>
+            <select v-model="course.level" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
               <option value="">Select Level</option>
               <option value="beginner">Beginner</option>
               <option value="intermediate">Intermediate</option>
@@ -117,170 +128,186 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Price ($)</label>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Price ($)</label>
             <input
               v-model.number="course.price"
               type="number"
               min="0"
               step="0.01"
               placeholder="0.00"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="course.is_free" />
-              Free Course
+          <div class="flex items-center">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" v-model="course.is_free" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <span class="text-sm text-gray-700">Free Course</span>
             </label>
           </div>
 
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="course.is_featured" />
-              Featured Course
+          <div class="flex items-center">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" v-model="course.is_featured" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <span class="text-sm text-gray-700">Featured Course</span>
             </label>
           </div>
 
-          <div class="form-group full-width">
-            <label>Thumbnail URL</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Thumbnail URL</label>
             <input
               v-model="course.thumbnail"
               type="text"
               placeholder="https://example.com/image.jpg"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
-          <div class="form-group full-width">
-            <label>Learning Objectives</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Learning Objectives</label>
             <textarea
               v-model="course.objectives"
               rows="4"
               placeholder="What students will learn (HTML supported)"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             ></textarea>
           </div>
 
-          <div class="form-group full-width">
-            <label>Requirements</label>
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Requirements</label>
             <textarea
               v-model="course.requirements"
               rows="4"
               placeholder="Prerequisites for the course (HTML supported)"
-              class="form-input"
+              class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             ></textarea>
           </div>
         </div>
       </div>
 
       <!-- Curriculum Tab -->
-      <div v-if="activeTab === 'curriculum' && isEditing" class="tab-content">
-        <div class="curriculum-header">
-          <h2>Course Sections</h2>
-          <button @click="showAddSection = true" class="add-btn">
+      <div v-if="activeTab === 'curriculum' && isEditing" class="bg-white border border-gray-200 rounded-xl p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-semibold text-gray-900">Course Sections</h2>
+          <button @click="showAddSection = true" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
             + Add Section
           </button>
         </div>
 
         <!-- Add Section Form -->
-        <div v-if="showAddSection" class="add-form">
+        <div v-if="showAddSection" class="bg-gray-50 p-4 rounded-lg mb-4 flex gap-4 items-center flex-wrap">
           <input
             v-model="newSection.title"
             type="text"
             placeholder="Section Title"
-            class="form-input"
+            class="flex-1 min-w-[200px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           />
-          <div class="form-actions">
-            <button @click="addSection" :disabled="!newSection.title" class="save-btn">
+          <div class="flex gap-2">
+            <button @click="addSection" :disabled="!newSection.title" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
               Add Section
             </button>
-            <button @click="showAddSection = false; newSection.title = ''" class="cancel-btn">
+            <button @click="showAddSection = false; newSection.title = ''" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
               Cancel
             </button>
           </div>
         </div>
 
-        <!-- Sections List -->
-        <div v-if="sections.length === 0" class="empty-state">
-          <p>No sections yet. Add your first section to get started.</p>
+        <!-- Empty State -->
+        <div v-if="sections.length === 0" class="text-center py-8">
+          <p class="text-gray-500">No sections yet. Add your first section to get started.</p>
         </div>
 
-        <div v-else class="sections-list">
-          <div v-for="(section, sIndex) in sections" :key="section.id" class="section-card">
-            <div class="section-header">
-              <div class="section-info">
-                <span class="section-number">Section {{ sIndex + 1 }}</span>
+        <!-- Sections List -->
+        <div v-else class="space-y-4">
+          <div v-for="(section, sIndex) in sections" :key="section.id" class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="flex justify-between items-center p-4 bg-gray-50">
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-500 uppercase">Section {{ sIndex + 1 }}</span>
                 <input
                   v-if="editingSection === section.id"
                   v-model="section.title"
-                  class="form-input inline"
+                  class="px-2 py-1 border border-gray-300 rounded text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   @blur="updateSection(section)"
                   @keyup.enter="updateSection(section)"
                 />
-                <h3 v-else @click="editingSection = section.id">{{ section.title }}</h3>
+                <h3 v-else @click="editingSection = section.id" class="text-sm font-semibold text-gray-900 cursor-pointer hover:text-indigo-600">
+                  {{ section.title }}
+                </h3>
               </div>
-              <div class="section-actions">
-                <button @click="toggleLessons(section.id)" class="toggle-btn">
-                  {{ expandedSections.includes(section.id) ? '▼' : '►' }}
-                  {{ section.lessons?.length || 0 }} lessons
+              <div class="flex gap-2">
+                <button @click="toggleLessons(section.id)" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                  {{ expandedSections.includes(section.id) ? '▼' : '►' }} {{ section.lessons?.length || 0 }} lessons
                 </button>
-                <button @click="deleteSection(section.id)" class="delete-btn">Delete</button>
+                <button @click="deleteSection(section.id)" class="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded transition-colors">
+                  Delete
+                </button>
               </div>
             </div>
 
             <!-- Lessons -->
-            <div v-if="expandedSections.includes(section.id)" class="lessons-container">
-              <div class="add-lesson-btn">
-                <button @click="startAddLesson(section.id)" class="add-btn small">
+            <div v-if="expandedSections.includes(section.id)" class="p-4 bg-white">
+              <div class="mb-4">
+                <button @click="startAddLesson(section.id)" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition-colors">
                   + Add Lesson
                 </button>
               </div>
 
               <!-- Add Lesson Form -->
-              <div v-if="addingLessonTo === section.id" class="add-form nested">
+              <div v-if="addingLessonTo === section.id" class="bg-gray-50 p-4 rounded-lg mb-4 flex gap-4 items-center flex-wrap">
                 <input
                   v-model="newLesson.title"
                   type="text"
                   placeholder="Lesson Title"
-                  class="form-input"
+                  class="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
-                <select v-model="newLesson.content_type" class="form-input">
+                <select v-model="newLesson.content_type" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                   <option value="video">Video</option>
                   <option value="article">Article</option>
                   <option value="quiz">Quiz</option>
                   <option value="file">File</option>
                 </select>
-                <div class="form-actions">
-                  <button @click="addLesson(section.id)" :disabled="!newLesson.title" class="save-btn small">
+                <div class="flex gap-2">
+                  <button @click="addLesson(section.id)" :disabled="!newLesson.title" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition-colors disabled:opacity-50">
                     Add Lesson
                   </button>
-                  <button @click="addingLessonTo = null" class="cancel-btn small">
+                  <button @click="addingLessonTo = null" class="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200 transition-colors">
                     Cancel
                   </button>
                 </div>
               </div>
 
               <!-- Lessons List -->
-              <div v-for="(lesson, lIndex) in section.lessons" :key="lesson.id" class="lesson-card">
-                <div class="lesson-header">
-                  <div class="lesson-info">
-                    <span class="lesson-number">{{ sIndex + 1 }}.{{ lIndex + 1 }}</span>
-                    <span class="lesson-type" :class="`type-${lesson.content_type}`">
+              <div class="space-y-2">
+                <div v-for="(lesson, lIndex) in section.lessons" :key="lesson.id" class="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs text-gray-500 font-mono">{{ sIndex + 1 }}.{{ lIndex + 1 }}</span>
+                    <span
+                      class="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase"
+                      :class="{
+                        'bg-blue-100 text-blue-700': lesson.content_type === 'video',
+                        'bg-green-100 text-green-700': lesson.content_type === 'article',
+                        'bg-amber-100 text-amber-700': lesson.content_type === 'quiz',
+                        'bg-gray-100 text-gray-600': lesson.content_type === 'file'
+                      }"
+                    >
                       {{ lesson.content_type }}
                     </span>
-                    <span class="lesson-title">{{ lesson.title }}</span>
+                    <span class="text-sm text-gray-900">{{ lesson.title }}</span>
                   </div>
-                  <div class="lesson-actions">
-                    <button @click="editLesson(lesson)" class="edit-btn">Edit</button>
-                    <button @click="deleteLesson(section.id, lesson.id)" class="delete-btn">Delete</button>
+                  <div class="flex gap-2">
+                    <button @click="editLesson(lesson)" class="px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 rounded transition-colors">
+                      Edit
+                    </button>
+                    <button @click="deleteLesson(section.id, lesson.id)" class="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors">
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div v-if="!section.lessons?.length" class="empty-lessons">
-                <p>No lessons in this section</p>
+              <div v-if="!section.lessons?.length" class="text-center py-4">
+                <p class="text-sm text-gray-500">No lessons in this section</p>
               </div>
             </div>
           </div>
@@ -289,84 +316,102 @@
     </div>
 
     <!-- Lesson Editor Modal -->
-    <div v-if="editingLesson" class="modal-overlay" @click.self="editingLesson = null">
-      <div class="modal">
-        <div class="modal-header">
-          <h2>Edit Lesson</h2>
-          <button @click="editingLesson = null" class="close-btn">&times;</button>
+    <div v-if="editingLesson" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6" @click.self="editingLesson = null">
+      <div class="bg-white rounded-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Edit Lesson</h2>
+          <button @click="editingLesson = null" class="text-2xl text-gray-400 hover:text-gray-600">&times;</button>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Title</label>
-            <input v-model="editingLesson.title" type="text" class="form-input" />
+        <div class="p-6 space-y-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Title</label>
+            <input v-model="editingLesson.title" type="text" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label>Content Type</label>
-            <select v-model="editingLesson.content_type" class="form-input">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Content Type</label>
+            <select v-model="editingLesson.content_type" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="video">Video</option>
               <option value="article">Article</option>
               <option value="quiz">Quiz</option>
               <option value="file">File</option>
             </select>
           </div>
-          <div v-if="editingLesson.content_type === 'video'" class="form-group">
-            <label>Video URL</label>
-            <input v-model="editingLesson.video_url" type="text" class="form-input" placeholder="https://..." />
+          <div v-if="editingLesson.content_type === 'video'" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Video URL</label>
+            <input v-model="editingLesson.video_url" type="text" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://..." />
           </div>
-          <div v-if="editingLesson.content_type === 'article'" class="form-group">
-            <label>Content (HTML)</label>
-            <textarea v-model="editingLesson.content" rows="8" class="form-input"></textarea>
+          <div v-if="editingLesson.content_type === 'article'" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Content (HTML)</label>
+            <textarea v-model="editingLesson.content" rows="8" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
           </div>
-          <div v-if="editingLesson.content_type === 'file'" class="form-group">
-            <label>File URL</label>
-            <input v-model="editingLesson.file_url" type="text" class="form-input" placeholder="https://..." />
+          <div v-if="editingLesson.content_type === 'file'" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">File URL</label>
+            <input v-model="editingLesson.file_url" type="text" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://..." />
           </div>
-          <div v-if="editingLesson.content_type === 'quiz'" class="form-group">
-            <label>Quiz ID</label>
-            <input v-model.number="editingLesson.quiz_id" type="number" class="form-input" />
-            <p class="hint">Create quizzes in the Quiz Builder and link them here</p>
+          <div v-if="editingLesson.content_type === 'quiz'" class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Quiz ID</label>
+            <input v-model.number="editingLesson.quiz_id" type="number" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <p class="text-xs text-gray-500">Create quizzes in the Quiz Builder and link them here</p>
           </div>
-          <div class="form-group">
-            <label>Duration (minutes)</label>
-            <input v-model.number="editingLesson.duration" type="number" class="form-input" />
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+            <input v-model.number="editingLesson.duration" type="number" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="editingLesson.is_preview" />
-              Available as Preview
+          <div>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" v-model="editingLesson.is_preview" class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <span class="text-sm text-gray-700">Available as Preview</span>
             </label>
           </div>
         </div>
-        <div class="modal-footer">
-          <button @click="saveLesson" class="save-btn">Save Changes</button>
-          <button @click="editingLesson = null" class="cancel-btn">Cancel</button>
+        <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+          <button @click="saveLesson" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+            Save Changes
+          </button>
+          <button @click="editingLesson = null" class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Status Modal -->
-    <div v-if="showStatusModal" class="modal-overlay" @click.self="showStatusModal = false">
-      <div class="modal small">
-        <div class="modal-header">
-          <h2>Update Status</h2>
-          <button @click="showStatusModal = false" class="close-btn">&times;</button>
+    <div v-if="showStatusModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6" @click.self="showStatusModal = false">
+      <div class="bg-white rounded-xl w-full max-w-sm">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Update Status</h2>
+          <button @click="showStatusModal = false" class="text-2xl text-gray-400 hover:text-gray-600">&times;</button>
         </div>
-        <div class="modal-body">
-          <div class="status-options">
-            <label v-for="status in ['draft', 'published', 'archived']" :key="status" class="status-option">
+        <div class="p-6">
+          <div class="space-y-3">
+            <label v-for="status in ['draft', 'published', 'archived']" :key="status" class="flex items-center gap-3 cursor-pointer">
               <input
                 type="radio"
                 :value="status"
                 v-model="newStatus"
                 name="status"
+                class="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
               />
-              <span :class="`status-badge status-${status}`">{{ status }}</span>
+              <span
+                class="px-3 py-1.5 text-sm font-medium rounded-md capitalize"
+                :class="{
+                  'bg-amber-100 text-amber-700': status === 'draft',
+                  'bg-green-100 text-green-700': status === 'published',
+                  'bg-gray-100 text-gray-600': status === 'archived'
+                }"
+              >
+                {{ status }}
+              </span>
             </label>
           </div>
         </div>
-        <div class="modal-footer">
-          <button @click="confirmStatusUpdate" class="save-btn">Update Status</button>
-          <button @click="showStatusModal = false" class="cancel-btn">Cancel</button>
+        <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+          <button @click="confirmStatusUpdate" class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+            Update Status
+          </button>
+          <button @click="showStatusModal = false" class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
@@ -607,447 +652,3 @@ async function deleteLesson(sectionId: number, lessonId: number) {
   }
 }
 </script>
-
-<style scoped>
-.course-editor {
-  max-width: 1200px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.header-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.back-btn {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  padding: 0;
-  background: none;
-}
-
-.back-btn:hover {
-  color: var(--color-text);
-}
-
-.header-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.status-btn {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.status-draft { background: #fef3c7; color: #92400e; }
-.status-published { background: #d1fae5; color: #065f46; }
-.status-archived { background: #e5e7eb; color: #6b7280; }
-
-.save-btn {
-  padding: 0.5rem 1.5rem;
-  background: var(--color-primary);
-  color: white;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-}
-
-.save-btn:hover { opacity: 0.9; }
-.save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.cancel-btn {
-  padding: 0.5rem 1rem;
-  background: var(--color-background-alt);
-  border-radius: var(--radius-md);
-}
-
-.loading-state {
-  text-align: center;
-  padding: 3rem;
-}
-
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 1.5rem;
-}
-
-.tabs button {
-  padding: 0.75rem 1.5rem;
-  background: none;
-  border-bottom: 2px solid transparent;
-  color: var(--color-text-muted);
-  font-weight: 500;
-}
-
-.tabs button.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.tabs button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tab-content {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.form-input {
-  padding: 0.625rem 0.875rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 0.9375rem;
-  width: 100%;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-label input {
-  width: 1.125rem;
-  height: 1.125rem;
-}
-
-/* Curriculum styles */
-.curriculum-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.curriculum-header h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.add-btn {
-  padding: 0.5rem 1rem;
-  background: var(--color-primary);
-  color: white;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-}
-
-.add-btn.small {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-}
-
-.add-form {
-  background: var(--color-background-alt);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.add-form.nested {
-  margin-left: 1rem;
-  margin-right: 1rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.sections-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.section-card {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: var(--color-background-alt);
-}
-
-.section-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.section-number {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-}
-
-.section-info h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.section-info h3:hover {
-  color: var(--color-primary);
-}
-
-.section-info .form-input.inline {
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.section-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.toggle-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  background: none;
-}
-
-.delete-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
-  color: var(--color-error);
-  background: none;
-}
-
-.delete-btn:hover {
-  background: #fef2f2;
-}
-
-.lessons-container {
-  padding: 1rem;
-  background: var(--color-background);
-}
-
-.add-lesson-btn {
-  margin-bottom: 1rem;
-}
-
-.lesson-card {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  margin-bottom: 0.5rem;
-}
-
-.lesson-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.lesson-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.lesson-number {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  font-family: monospace;
-}
-
-.lesson-type {
-  font-size: 0.6875rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: 999px;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.type-video { background: #dbeafe; color: #1e40af; }
-.type-article { background: #d1fae5; color: #065f46; }
-.type-quiz { background: #fef3c7; color: #92400e; }
-.type-file { background: #e5e7eb; color: #6b7280; }
-
-.lesson-title {
-  font-size: 0.9375rem;
-}
-
-.lesson-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.edit-btn {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8125rem;
-  color: var(--color-primary);
-  background: none;
-}
-
-.empty-state, .empty-lessons {
-  text-align: center;
-  padding: 2rem;
-  color: var(--color-text-muted);
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: var(--color-background);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal.small {
-  max-width: 400px;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-header h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.close-btn {
-  font-size: 1.5rem;
-  color: var(--color-text-muted);
-  background: none;
-  padding: 0;
-  line-height: 1;
-}
-
-.modal-body {
-  padding: 1.5rem;
-}
-
-.modal-body .form-group {
-  margin-bottom: 1rem;
-}
-
-.modal-body .hint {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  margin-top: 0.25rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--color-border);
-}
-
-.status-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.status-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-}
-
-.status-badge {
-  padding: 0.375rem 0.75rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-}
-</style>

@@ -1,68 +1,76 @@
 <template>
-  <div class="courses-page">
-    <header class="page-header">
-      <h1>Courses</h1>
-      <button @click="router.push('/admin/courses/new')" class="create-btn">
+  <div class="max-w-7xl">
+    <header class="flex justify-between items-center mb-6 flex-wrap gap-4">
+      <h1 class="text-2xl font-semibold text-gray-900">Courses</h1>
+      <button @click="router.push('/admin/courses/new')" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
         + Create Course
       </button>
     </header>
 
     <!-- Search and Filter -->
-    <div class="filters-bar">
-      <div class="search-box">
+    <div class="flex gap-4 mb-6 flex-wrap">
+      <div class="flex gap-2 flex-1 min-w-[200px]">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search courses..."
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           @keyup.enter="fetchCourses"
         />
-        <button @click="fetchCourses" class="search-btn">Search</button>
+        <button @click="fetchCourses" class="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors">
+          Search
+        </button>
       </div>
-      <div class="filter-group">
-        <select v-model="statusFilter" @change="fetchCourses">
-          <option value="">All Status</option>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="archived">Archived</option>
-        </select>
-      </div>
+      <select v-model="statusFilter" @change="fetchCourses" class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[150px] focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">All Status</option>
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+        <option value="archived">Archived</option>
+      </select>
     </div>
 
-    <div class="courses-table-container">
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading courses...</p>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div v-if="loading" class="p-8 text-center">
+        <p class="text-gray-500">Loading courses...</p>
       </div>
 
-      <div v-else class="table-wrapper">
-        <table class="data-table">
-          <thead>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Students</th>
-              <th>Rating</th>
-              <th>Actions</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Students</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rating</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="course in courses" :key="course.id">
-              <td class="course-title">{{ course.title }}</td>
-              <td>
-                <span class="badge" :class="`badge-${course.status}`">
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="course in courses" :key="course.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-medium text-gray-900">{{ course.title }}</td>
+              <td class="px-5 py-4">
+                <span
+                  class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full"
+                  :class="{
+                    'bg-green-100 text-green-700': course.status === 'published',
+                    'bg-amber-100 text-amber-700': course.status === 'draft',
+                    'bg-gray-100 text-gray-600': course.status === 'archived'
+                  }"
+                >
                   {{ course.status }}
                 </span>
               </td>
-              <td>{{ course.enrollment_count || 0 }}</td>
-              <td>{{ course.rating_average || '—' }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button @click="editCourse(course.id)" class="action-btn edit">
+              <td class="px-5 py-4 text-sm text-gray-600">{{ course.enrollment_count || 0 }}</td>
+              <td class="px-5 py-4 text-sm text-gray-600">{{ course.rating_average || '—' }}</td>
+              <td class="px-5 py-4">
+                <div class="flex gap-2">
+                  <button @click="editCourse(course.id)" class="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors">
                     Edit
                   </button>
-                  <button @click="viewCourse(course.id)" class="action-btn">
+                  <button @click="viewCourse(course.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
                     View
                   </button>
-                  <button @click="deleteCourse(course.id)" class="action-btn delete">
+                  <button @click="deleteCourse(course.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
                     Delete
                   </button>
                 </div>
@@ -71,8 +79,8 @@
           </tbody>
         </table>
 
-        <div v-if="courses.length === 0" class="empty-state">
-          <p class="text-muted">No courses found</p>
+        <div v-if="courses.length === 0" class="p-8 text-center">
+          <p class="text-gray-500">No courses found</p>
         </div>
       </div>
     </div>
@@ -130,201 +138,3 @@ async function deleteCourse(id: number) {
   }
 }
 </script>
-
-<style scoped>
-.courses-page {
-  max-width: 1400px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xl);
-}
-
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.create-btn {
-  padding: 0.5rem 1rem;
-  background: var(--color-primary, #4f46e5);
-  color: white;
-  border-radius: var(--radius-md, 0.375rem);
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.create-btn:hover {
-  opacity: 0.9;
-}
-
-.filters-bar {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: var(--spacing-lg, 1.5rem);
-  flex-wrap: wrap;
-}
-
-.search-box {
-  display: flex;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 0.375rem);
-  font-size: 0.875rem;
-}
-
-.search-btn {
-  padding: 0.5rem 1rem;
-  background: var(--color-background-alt, #f9fafb);
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 0.375rem);
-  font-size: 0.875rem;
-}
-
-.search-btn:hover {
-  background: var(--color-border, #e5e7eb);
-}
-
-.filter-group select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--radius-md, 0.375rem);
-  font-size: 0.875rem;
-  min-width: 150px;
-}
-
-.action-btn.edit {
-  color: var(--color-primary, #4f46e5);
-}
-
-.action-btn.edit:hover {
-  background: #eef2ff;
-}
-
-.courses-table-container {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.loading-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.data-table th {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background: var(--color-background-alt);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.course-title {
-  font-weight: 500;
-}
-
-.badge-published {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge-draft {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.badge-archived {
-  background: var(--color-background-alt);
-  color: var(--color-text-muted);
-}
-
-.action-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.action-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  color: var(--color-text);
-  background: var(--color-background-alt);
-}
-
-.action-btn.delete:hover {
-  color: var(--color-error);
-  background: #fef2f2;
-}
-
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-}
-</style>

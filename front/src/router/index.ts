@@ -27,7 +27,7 @@ const router = createRouter({
             name: 'AdminLogin',
             component: () => import('@/views/admin/Login.vue')
         },
-        {˝
+        {
             path: '/admin',
             component: AdminLayout,
             meta: { requiresAuth: true, isAdmin: true },

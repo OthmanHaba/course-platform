@@ -1,41 +1,45 @@
 <template>
-  <div class="login-page">
-    <div class="login-card">
-      <div class="login-header">
-        <h1>Admin</h1>
-        <p class="text-muted text-sm">Sign in to continue</p>
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 p-6">
+    <div class="w-full max-w-md bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-semibold text-gray-900 mb-1">Admin</h1>
+        <p class="text-sm text-gray-500">Sign in to continue</p>
       </div>
 
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="email" class="form-label">Email</label>
+      <form @submit.prevent="handleLogin" class="space-y-5">
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
           <input
             v-model="email"
             type="email"
             id="email"
             required
-            class="input"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             placeholder="admin@example.com"
           />
         </div>
 
-        <div class="form-group">
-          <label for="password" class="form-label">Password</label>
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
           <input
             v-model="password"
             type="password"
             id="password"
             required
-            class="input"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             placeholder="Enter password"
           />
         </div>
 
-        <div v-if="error" class="error-message">
+        <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
           {{ error }}
         </div>
 
-        <button type="submit" :disabled="loading" class="btn btn-primary w-full">
+        <button
+          type="submit"
+          :disabled="loading"
+          class="w-full py-2.5 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {{ loading ? 'Signing in...' : 'Sign in' }}
         </button>
       </form>
@@ -71,70 +75,3 @@ async function handleLogin() {
   loading.value = false
 }
 </script>
-
-<style scoped>
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-background-alt);
-  padding: var(--spacing-lg);
-}
-
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-2xl);
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: var(--spacing-2xl);
-}
-
-.login-header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
-}
-
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
-.form-label {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.error-message {
-  padding: 0.75rem;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-md);
-  color: var(--color-error);
-  font-size: 0.875rem;
-}
-
-.w-full {
-  width: 100%;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-</style>

@@ -1,64 +1,70 @@
 <template>
-  <div class="users-page">
-    <header class="page-header">
-      <h1>Users</h1>
+  <div class="max-w-7xl">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">Users</h1>
     </header>
 
     <!-- Filters -->
-    <div class="filters-bar">
-      <div class="search-box">
+    <div class="flex gap-4 mb-6 flex-wrap">
+      <div class="flex gap-2 flex-1 min-w-[200px]">
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Search users..."
+          class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           @keyup.enter="fetchUsers"
         />
-        <button @click="fetchUsers" class="search-btn">Search</button>
+        <button @click="fetchUsers" class="px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors">
+          Search
+        </button>
       </div>
-      <div class="filter-group">
-        <select v-model="typeFilter" @change="fetchUsers">
-          <option value="">All Types</option>
-          <option value="admin">Admin</option>
-          <option value="instructor">Instructor</option>
-          <option value="student">Student</option>
-        </select>
-      </div>
+      <select v-model="typeFilter" @change="fetchUsers" class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[150px] focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">All Types</option>
+        <option value="admin">Admin</option>
+        <option value="instructor">Instructor</option>
+        <option value="student">Student</option>
+      </select>
     </div>
 
-    <div class="users-table-container">
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading users...</p>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div v-if="loading" class="p-8 text-center">
+        <p class="text-gray-500">Loading users...</p>
       </div>
 
-      <div v-else class="table-wrapper">
-        <table class="data-table">
-          <thead>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="user in users" :key="user.id">
-              <td class="user-name">{{ user.first_name }} {{ user.last_name }}</td>
-              <td class="text-muted">{{ user.email }}</td>
-              <td>
-                <span class="badge badge-type">{{ user.user_type }}</span>
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-medium text-gray-900">{{ user.first_name }} {{ user.last_name }}</td>
+              <td class="px-5 py-4 text-sm text-gray-500">{{ user.email }}</td>
+              <td class="px-5 py-4">
+                <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                  {{ user.user_type }}
+                </span>
               </td>
-              <td>
-                <span class="badge" :class="user.is_active ? 'badge-active' : 'badge-inactive'">
+              <td class="px-5 py-4">
+                <span
+                  class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full"
+                  :class="user.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                >
                   {{ user.is_active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-              <td>
-                <div class="action-buttons">
-                  <button @click="toggleUserStatus(user)" class="action-btn">
+              <td class="px-5 py-4">
+                <div class="flex gap-2">
+                  <button @click="toggleUserStatus(user)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
                     {{ user.is_active ? 'Deactivate' : 'Activate' }}
                   </button>
-                  <button @click="deleteUser(user.id)" class="action-btn delete">
+                  <button @click="deleteUser(user.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
                     Delete
                   </button>
                 </div>
@@ -67,8 +73,8 @@
           </tbody>
         </table>
 
-        <div v-if="users.length === 0" class="empty-state">
-          <p class="text-muted">No users found</p>
+        <div v-if="users.length === 0" class="p-8 text-center">
+          <p class="text-gray-500">No users found</p>
         </div>
       </div>
     </div>
@@ -126,177 +132,3 @@ async function deleteUser(id: number) {
   }
 }
 </script>
-
-<style scoped>
-.users-page {
-  max-width: 1400px;
-}
-
-.page-header {
-  margin-bottom: var(--spacing-xl, 1.5rem);
-}
-
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.filters-bar {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.search-box {
-  display: flex;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 200px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-}
-
-.search-btn {
-  padding: 0.5rem 1rem;
-  background: var(--color-background-alt, #f9fafb);
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-}
-
-.search-btn:hover {
-  background: var(--color-border, #e5e7eb);
-}
-
-.filter-group select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  min-width: 150px;
-}
-
-.users-table-container {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.loading-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.data-table th {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background: var(--color-background-alt);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.user-name {
-  font-weight: 500;
-}
-
-.badge-type {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.badge-active {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge-inactive {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.action-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.action-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  color: var(--color-text);
-  background: var(--color-background-alt);
-}
-
-.action-btn.delete:hover {
-  color: var(--color-error);
-  background: #fef2f2;
-}
-
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-}
-</style>

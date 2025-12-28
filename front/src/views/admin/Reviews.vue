@@ -1,47 +1,52 @@
 <template>
-  <div class="reviews-page">
-    <header class="page-header">
-      <h1>Reviews</h1>
+  <div class="max-w-7xl">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">Reviews</h1>
     </header>
 
-    <div class="reviews-table-container">
-      <div v-if="loading" class="loading-state">
-        <p class="text-muted">Loading reviews...</p>
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div v-if="loading" class="p-8 text-center">
+        <p class="text-gray-500">Loading reviews...</p>
       </div>
 
-      <div v-else class="table-wrapper">
-        <table class="data-table">
-          <thead>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th>Student</th>
-              <th>Course</th>
-              <th>Rating</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Rating</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="review in reviews" :key="review.id">
-              <td class="student-name">{{ review.first_name }} {{ review.last_name }}</td>
-              <td class="text-muted">{{ review.course_title }}</td>
-              <td>
-                <span class="badge badge-rating">{{ review.rating }}/5</span>
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="review in reviews" :key="review.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-medium text-gray-900">{{ review.first_name }} {{ review.last_name }}</td>
+              <td class="px-5 py-4 text-sm text-gray-500">{{ review.course_title }}</td>
+              <td class="px-5 py-4">
+                <span class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">
+                  {{ review.rating }}/5
+                </span>
               </td>
-              <td>
-                <span class="badge" :class="review.is_approved ? 'badge-approved' : 'badge-pending'">
+              <td class="px-5 py-4">
+                <span
+                  class="inline-flex px-2.5 py-1 text-xs font-medium rounded-full"
+                  :class="review.is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
+                >
                   {{ review.is_approved ? 'Approved' : 'Pending' }}
                 </span>
               </td>
-              <td>
-                <div class="action-buttons">
+              <td class="px-5 py-4">
+                <div class="flex gap-2">
                   <button
                     v-if="!review.is_approved"
                     @click="approveReview(review.id)"
-                    class="action-btn"
+                    class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                   >
                     Approve
                   </button>
-                  <button @click="deleteReview(review.id)" class="action-btn delete">
+                  <button @click="deleteReview(review.id)" class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors">
                     Delete
                   </button>
                 </div>
@@ -50,8 +55,8 @@
           </tbody>
         </table>
 
-        <div v-if="reviews.length === 0" class="empty-state">
-          <p class="text-muted">No reviews found</p>
+        <div v-if="reviews.length === 0" class="p-8 text-center">
+          <p class="text-gray-500">No reviews found</p>
         </div>
       </div>
     </div>
@@ -102,135 +107,3 @@ async function deleteReview(id: number) {
   }
 }
 </script>
-
-<style scoped>
-.reviews-page {
-  max-width: 1400px;
-}
-
-.page-header {
-  margin-bottom: var(--spacing-2xl);
-}
-
-.page-header h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.reviews-table-container {
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.loading-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  background: var(--color-background-alt);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.data-table th {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.2s;
-}
-
-.data-table tbody tr:hover {
-  background: var(--color-background-alt);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.data-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.9375rem;
-  color: var(--color-text);
-}
-
-.student-name {
-  font-weight: 500;
-}
-
-.badge-rating {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.badge-approved {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge-pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.action-buttons {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.action-btn {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background: transparent;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  color: var(--color-text);
-  background: var(--color-background-alt);
-}
-
-.action-btn.delete:hover {
-  color: var(--color-error);
-  background: #fef2f2;
-}
-
-.empty-state {
-  padding: var(--spacing-2xl);
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-}
-</style>
