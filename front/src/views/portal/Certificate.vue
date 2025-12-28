@@ -175,8 +175,8 @@ const instructorName = computed(() => {
 })
 
 const completionDate = computed(() => {
-  if (enrollment.value?.completed_at) {
-    return new Date(enrollment.value.completed_at).toLocaleDateString('en-US', {
+  if (enrollment.value?.completion_date) {
+    return new Date(enrollment.value.completion_date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -202,7 +202,7 @@ onMounted(async () => {
     // Check if user is enrolled and has completed
     const myCoursesRes = await portalService.getMyCourses()
     const myCourses = myCoursesRes.data.data || []
-    enrollment.value = myCourses.find((c: any) => c.course_id === courseId)
+    enrollment.value = myCourses.find((c: any) => Number(c.course_id) === courseId || Number(c.id) === courseId)
 
     if (!enrollment.value) {
       error.value = 'You are not enrolled in this course'

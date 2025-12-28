@@ -111,6 +111,25 @@
             </div>
           </div>
         </div>
+
+        <!-- Certificate Section (show when course is completed) -->
+        <div v-if="courseCompleted" class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg shadow p-4 mt-4 text-white">
+          <div class="flex items-center gap-3 mb-3">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <h3 class="font-bold">Course Completed!</h3>
+              <p class="text-sm text-green-100">Congratulations on finishing!</p>
+            </div>
+          </div>
+          <button
+            @click="router.push(`/certificate/${courseId}`)"
+            class="w-full py-2 bg-white text-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
+          >
+            View Certificate
+          </button>
+        </div>
       </div>
 
       <!-- Lesson Content -->
@@ -309,16 +328,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { portalService } from '@/services/portalService'
 
 const route = useRoute()
+const router = useRouter()
 const courseId = Number(route.params.courseId)
 
 const curriculum = ref<any[]>([])
 const currentLesson = ref<any>(null)
 const loadingLesson = ref(false)
+
+// Check if all lessons are completed
+const courseCompleted = computed(() => {
+  if (curriculum.value.length === 0) return false
+  let totalLessons = 0
+  let completedLessons = 0
+
+  curriculum.value.forEach(section => {
+    section.lessons?.forEach((lesson: any) => {
+      totalLessons++
+      if (lesson.is_completed == 1 || lesson.is_completed === true) {
+        completedLessons++
+      }
+    })
+  })
+
+  return totalLessons > 0 && completedLessons === totalLessons
+})
 
 // Quiz state
 const quiz = ref<any>(null)
